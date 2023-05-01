@@ -1,0 +1,3 @@
+export const APIURLAUTH=window.location.host == 'localhost:3011' ? 'http://localhost:5006/api/conferenceQuiz/auth' : `https://quiz.quizophy.com/api/conferenceQuiz/auth`
+export const APIURLQUIZ=window.location.host == 'localhost:3011' ? 'http://localhost:5006/api/conferenceQuiz/quiz' : `https://quiz.quizophy.com/api/conferenceQuiz/quiz`
+export const APIURLTEMPLATE=window.location.host == 'localhost:3011' ? 'http://localhost:5006/api/conferenceQuiz/template' : `https://quiz.quizophy.com/api/conferenceQuiz/template`

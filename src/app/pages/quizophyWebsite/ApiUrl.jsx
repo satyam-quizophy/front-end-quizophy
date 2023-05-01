@@ -1,0 +1,1 @@
+export const QUIZOPHY_WEBSITE_API_URL=window.location.host==="localhost:3011"?"http://localhost:5006/api/conferenceQuiz/web/admin-setting":"https://quiz.quizophy.com/api/conferenceQuiz/web/admin-setting"
