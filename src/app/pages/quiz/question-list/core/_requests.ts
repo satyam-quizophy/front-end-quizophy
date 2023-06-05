@@ -2,19 +2,19 @@ import axios, {AxiosResponse} from 'axios'
 import {ID, Response} from '../../../../../_metronic/helpers'
 import {User, UsersQueryResponse} from './_models'
 
-const API_URL = 'https://quiz.datacubeindia.com/api/question'
+const API_URL = window.location.host==="localhost:3011"?"http://localhost:5002/api/question" : 'https://quiz.quizophy.com/api/question'
 const QUESTION_URL = `${API_URL}/question`
-const QUIZ_URL = 'https://quiz.datacubeindia.com/api/quiz/quiz'
+const QUIZ_URL = window.location.host==="localhost:3011"?"http://localhost:5003/api/quiz/quiz": 'https://quiz.quizophy.com/api/quiz/quiz'
 
-const getUsers = (query: string): Promise<UsersQueryResponse> => {
+const getUsers = (id:any,query: string): Promise<UsersQueryResponse> => {
   return axios
-    .get(`${QUESTION_URL}?${query}`)
+    .get(`${QUESTION_URL}/getFiltreredQuestion/${id}?${query}`)
     .then((d: AxiosResponse<UsersQueryResponse>) => d.data)
 }
 
-const getQuizQuestions = (id: ID): Promise<any> => {
+const getQuizQuestions = (id: number,quiz_id:any): Promise<any> => {
   return axios
-    .get(`${QUIZ_URL}/quizQuestion/${id}`)
+    .get(`${QUIZ_URL}/quizQuestion/${id}/${quiz_id}`)
     .then((d: AxiosResponse<UsersQueryResponse>) => d.data)
 }
 
@@ -28,8 +28,6 @@ const getUserById = (id: ID): Promise<User | undefined> => {
 const addQuestion = (question: any): Promise<any> => {
   return axios
     .post(`${QUIZ_URL}/addQuestion`, question)
-    .then((response: AxiosResponse<Response<User>>) => response.data)
-    .then((response: Response<User>) => response.data)
 }
 
 const addSelectedQuestion = (questionId: Array<ID>, quizId: any): Promise<void> => {
@@ -39,12 +37,12 @@ const addSelectedQuestion = (questionId: Array<ID>, quizId: any): Promise<void> 
   return axios.all(requests).then(() => {})
 }
 
-const deleteUser = (questionId: ID): Promise<void> => {
-  return axios.delete(`${QUIZ_URL}/question/${questionId}`).then(() => {})
+const deleteUser = (questionId: ID,quiz_id:any): Promise<void> => {
+  return axios.delete(`${QUIZ_URL}/question/${questionId}/${quiz_id}`).then(() => {})
 }
 
-const deleteSelectedUsers = (questionId: Array<ID>): Promise<void> => {
-  const requests = questionId.map((id) => axios.delete(`${QUIZ_URL}/question/${id}`))
+const deleteSelectedUsers = (questionId: Array<ID>,quiz_id:any): Promise<void> => {
+  const requests = questionId.map((id) => axios.delete(`${QUIZ_URL}/question/${id}/${quiz_id}`))
   return axios.all(requests).then(() => {})
 }
 

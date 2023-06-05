@@ -80,7 +80,7 @@ const usersColumns: ReadonlyArray<Column<User>> = [
     Cell: ({...props}) => (
       <UserTwoStepsCell
         status={props.data[props.row.index].status}
-        id={props.data[props.row.index].id}
+         id={props.data[props.row.index].id}
       />
     ),
   },

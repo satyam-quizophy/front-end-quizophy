@@ -12,6 +12,7 @@ const MiddleWare = ({children}:any) => {
     const getAuthorizedAsideMenu=async ()=>{
           const {data}=await axios.get(`${API_URL}/option/getAsideMenu/${currentUser?.id}`)
           if(data?.success){
+            console.log(data)
             data?.data && data?.data?.map((item:any,index:number)=>{
               if(typeof item?.name==="string"){
                 filterUrlArr.push(item?.url)
@@ -27,12 +28,25 @@ const MiddleWare = ({children}:any) => {
                 type:"addAsideMenu",
                 payload:data.data
             })
+
+            dispatch({
+              type:"addStaffPermission",
+              payload:data.permissions
+          })
             
           }
     }
     useEffect(()=>{
        getAuthorizedAsideMenu()
     },[])
+
+
+    // const getA
+
+
+    // useEffect(()=>{
+    //    getAllStaffAuthorizedPermission()
+    // },[])
   return (
     <div>{children}</div>
   )

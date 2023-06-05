@@ -23,10 +23,10 @@ const usersColumns: ReadonlyArray<Column<User>> = [
   },
   {
     Header: (props) => (
-      <UserCustomHeader tableProps={props} title='Courses' className='min-w-125px' />
+      <UserCustomHeader tableProps={props} title='Courses_Ids' className='min-w-125px' />
     ),
-    id: 'courses',
-    Cell: ({...props}) => <SubjectCell courses={props.data[props.row.index].courses} />,
+    id: 'course',
+    Cell: ({...props}) => <SubjectCell courses={props.data[props.row.index]} />,
   },
   {
     Header: (props) => (

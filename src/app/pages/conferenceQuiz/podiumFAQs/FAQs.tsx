@@ -17,7 +17,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Switch from '@mui/material/Switch';
 import ToastComp from '../userList/ToastComp';
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { useSelector } from 'react-redux';
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -66,7 +68,29 @@ export default function FAQs() {
 
   const [expanded, setExpanded] = React.useState<string | false>('panel1');
   const [faq,setfaq]=useState<any[]>([])
-
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+    const [permissionList,setPermissionList]=useState<any>({})
+    const filterStaffPermission=async (title:string)=>{
+      let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+      setPermissionList(result[0])
+    }
+    useEffect(()=>{
+      filterStaffPermission(navItem?.item)
+      },[navItem])
+  const modules = {
+    toolbar: [
+        [{header:[1,2,3,4,5,6,false]     
+        }],
+        [{ 'color': [] }, { 'background': [] }], 
+      [{size: []}],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, 
+       {'indent': '-1'}, {'indent': '+1'}],
+      ['link','image', 'video'],
+      [{ 'align': [] }],
+      ['clean']
+    ],
+}
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
       setExpanded(newExpanded ? panel : false);
@@ -99,15 +123,15 @@ export default function FAQs() {
     <div className="container mt-0">
          
               <div className="row d-flex justify-content-end my-5">
-              <button className="btn btn-primary" style={{width:"200px"}} onClick={()=>{
+             {permissionList?.can_create && <button className="btn btn-primary" style={{width:"200px"}} onClick={()=>{
                 setEditFaq(null)
                 setOpen(true)
-               }}>Add More FAQs</button>
+               }}>Add More FAQs</button>}
               </div>
               
         {
 
-            faq?.length>0 ?
+            permissionList?.can_view && faq?.length>0 ?
             faq.map((item,index)=>{
                 return    <Accordion key={index} expanded={expanded === `panel${index+1}`} onChange={handleChange(`panel${index+1}`)}>
                 <AccordionSummary aria-controls="panel1d-content" id="panel1d-header" style={{background:`${index%2===0 ? "#cbe5e0":"#f2f2f2"}`}}>
@@ -117,17 +141,19 @@ export default function FAQs() {
                   <div  style={{color:"black",fontSize:"16px",fontWeight:"500"}}>
                    <div className="w-100" style={{display:"flex",justifyContent:"space-between"}}>
                    {item?.answer}
-                    <span><AiFillEdit style={{color:"black",fontSize:"18px",marginRight:"10px",cursor:"pointer"}} onClick={()=>{
+                    <span>
+                      {permissionList?.can_edit && <AiFillEdit style={{color:"black",fontSize:"18px",marginRight:"10px",cursor:"pointer"}} onClick={()=>{
                         onOpenModal(item)
-                  }}/>
-                  <AiFillDelete style={{color:"red",fontSize:"20px",cursor:"pointer"}} onClick={async ()=>{
+                  }}/>}
+                 {permissionList?.can_delete && <AiFillDelete style={{color:"red",fontSize:"20px",cursor:"pointer"}} onClick={async ()=>{
                       const {data}=await axios.delete(`${APIURLQUIZ}/admin/deleteFaqsById/${item?.id}`)
                       if(data?.success){
                         getAllFAQS()
                         ToastComp({message:data?.message,type:"Success"})
 
                       }
-                  }}/></span>
+                  }}/>}
+                  </span>
                 </div>
                   </div>
                 </AccordionDetails>
@@ -157,7 +183,7 @@ export default function FAQs() {
                       <div className="col-md-12 fv-row fv-plugins-icon-container mt-3">
                                   <label className="required fs-6 fw-semibold mb-1">Type FAQ Answer</label>
                                
-                                  <input type="text" className="form_style form-control form-control-solid fw-bolder" style={{background:"#f2f2f2"}} value={editFaq?.id?editFaq?.answer:createFaq?.answer}  onChange={(e:any)=>{
+                                  <textarea rows={4} className="form_style form-control form-control-solid fw-bolder" style={{background:"#f2f2f2"}} value={editFaq?.id?editFaq?.answer:createFaq?.answer}  onChange={(e:any)=>{
                                      if(editFaq?.id){
                                         setEditFaq({...editFaq,answer:e?.target?.value})
                                     }else{

@@ -80,7 +80,7 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
                     placeholder={'Enter Program Name'}
                   >
                     <option></option>
-                    {programs.map((item: any, i: any) => (
+                    {programs?.map((item: any, i: any) => (
                       <option key={i} value={item.id}>
                         {item?.name}
                       </option>
@@ -102,7 +102,7 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
                     placeholder={'Select Quiz'}
                   >
                     <option></option>
-                    {sponsors.map((item: any, i: any) => (
+                    {sponsors?.map((item: any, i: any) => (
                       <option key={i} value={item.id}>
                         {item?.name}
                       </option>

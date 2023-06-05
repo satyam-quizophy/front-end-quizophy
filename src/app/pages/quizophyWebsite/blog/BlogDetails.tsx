@@ -9,7 +9,6 @@ const BlogDetails = () => {
    const getBlogById=async ()=>{
        const {data}=await axios.get(`${QUIZOPHY_WEBSITE_API_URL}/blog/admin/${params.id}`)
        if(data?.success){
-        console.log(data?.data)
         setBlog(data?.data)
        }
    }
@@ -25,7 +24,7 @@ const BlogDetails = () => {
                    <div className="col-12">
                          <div className="mx-auto p-5 d-flex flex-column text-center" style={{boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>
                           <h2 className="text-primary">{blog?.title}</h2>
-                          <p style={{fontSize:"12px"}}><span className="text-warning me-3" style={{fontSize:"12px"}}>DD-MM-YYYY HH:MM:SS</span><span style={{fontWeight:"600"}}>{new Date(blog?.date_time)?.getDate()+"-"+new Date(blog?.date_time)?.getMonth()+1+"-"+new Date(blog?.date_time)?.getFullYear()+"   "+new Date(blog?.date_time)?.getHours()+":"+new Date(blog?.date_time)?.getMinutes()+":"+new Date(blog?.date_time)?.getSeconds()}</span></p>
+                          <p style={{fontSize:"12px"}}><span style={{fontWeight:"600"}}>{new Date(blog?.date_time)?.getDate()+"-"+(Number(new Date(blog?.date_time)?.getMonth())+1)+"-"+new Date(blog?.date_time)?.getFullYear()+"   "+new Date(blog?.date_time)?.getHours()+":"+new Date(blog?.date_time)?.getMinutes()+":"+new Date(blog?.date_time)?.getSeconds()}</span></p>
                             <div style={{width:"50%",height:"280px",margin:"20px auto"}}>
                               <img src={blog?.image} style={{width:"100%",height:"100%"}}/>
                             </div> 

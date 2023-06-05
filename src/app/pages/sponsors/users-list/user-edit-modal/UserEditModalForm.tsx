@@ -10,6 +10,7 @@ import Swal from 'sweetalert2'
 import ReactQuill from 'react-quill'
 import axios, {AxiosResponse} from 'axios'
 import {API_URL} from '../../../settings/components/ApiUrl'
+import 'react-quill/dist/quill.snow.css';
 
 type Props = {
   isUserLoading: boolean
@@ -83,10 +84,10 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
       var formData = new FormData()
       formData.append('image', file)
       await axios
-        .post(`${API_URL}/upload`, formData)
+        .post(`${API_URL}/staff/upload-image`, formData)
         .then((data: AxiosResponse<any>) => {
           var range = questionRef.current.getEditor().getSelection()
-          questionRef.current.getEditor().insertEmbed(range?.index, 'image', data.data)
+          questionRef.current.getEditor().insertEmbed(range?.index, 'image', data.data?.image)
         })
         .catch((err) => {
           console.log(err, 'err')

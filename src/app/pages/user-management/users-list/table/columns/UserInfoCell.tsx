@@ -13,7 +13,7 @@ const UserInfoCell: FC<Props> = ({user}) => {
   const {setItemIdForUpdate} = useListView()
 
   const openEditModal = () => {
-    setItemIdForUpdate(user.id)
+    // setItemIdForUpdate(user.id)
   }
 
   return (

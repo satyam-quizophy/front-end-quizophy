@@ -18,6 +18,7 @@ import Dropzone from 'react-dropzone';
 import { APIURLQUIZ } from '../../conferenceQuiz/APIURL';
 import { QUIZOPHY_WEBSITE_API_URL } from '../ApiUrl';
 import ToatComp from '../blog/ToatComp';
+import { useSelector } from 'react-redux';
 
 
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
@@ -36,6 +37,15 @@ export default function WinnerList() {
     const [featuresImage,setFeaturesImage]=useState<string>("")
 
 const [filterPodiumCategory,setFilterPodiumCategory] =useState<any[]>([])
+const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+const [permissionList,setPermissionList]=useState<any>({})
+const filterStaffPermission=async (title:string)=>{
+  let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+  setPermissionList(result[0])
+}
+useEffect(()=>{
+  filterStaffPermission(navItem?.item)
+  },[navItem])
   const uploadImage = async (file: any) => {
     const fd = new FormData()
     if(Math.ceil( ( (file[0].size * 8) / 8) / 1000 )>1024){
@@ -99,15 +109,15 @@ const [filterPodiumCategory,setFilterPodiumCategory] =useState<any[]>([])
     <div className="container mt-0">
          
               <div className="row my-5 mb-5 mx-auto">
-              <button className="btn btn-primary" style={{width:"250px",height:"43px",marginLeft:"auto"}} onClick={()=>{
+             {permissionList?.can_create && <button className="btn btn-primary" style={{width:"250px",height:"43px",marginLeft:"auto"}} onClick={()=>{
                 setEditWinnerList(null)
                 setOpen(true)
-               }}>Add Winner List</button>
+               }}>Add Winner List</button>}
               </div>
 
               <div className="gy-5" style={{display:"flex", flexWrap:"wrap", flexDirection:"row",justifyContent:"space-evenly"}}>
               {
-filterPodiumCategory?.length>0 ?
+permissionList?.can_view && filterPodiumCategory?.length>0 ?
 filterPodiumCategory.map((item,index)=>{
     return    <div key={index} className="card m-4 col-md-4" style={{boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
         <div style={{width:"140px",height:"140px",margin:"15px auto"}}>
@@ -119,17 +129,19 @@ filterPodiumCategory.map((item,index)=>{
       <h6 className="card-title">Date : <span className="text-primary">{item?.date_time}</span></h6>
 
       <div className="w-100" style={{display:"flex",justifyContent:"flex-end",margin:"30px auto 3px auto"}}>
-        <span><AiFillEdit style={{color:"black",fontSize:"20px",marginRight:"10px",cursor:"pointer"}} onClick={()=>{
+        <span>
+          {permissionList?.can_edit && <AiFillEdit style={{color:"black",fontSize:"20px",marginRight:"10px",cursor:"pointer"}} onClick={()=>{
             setFeaturesImage(item?.image)
             onOpenModal(item)
-      }}/>
-      <AiFillDelete style={{color:"red",fontSize:"20px",cursor:"pointer"}} onClick={async ()=>{
+          }}/>}
+          {permissionList?.can_delete && <AiFillDelete style={{color:"red",fontSize:"20px",cursor:"pointer"}} onClick={async ()=>{
           const {data}=await axios.delete(`${QUIZOPHY_WEBSITE_API_URL}/winnerList/${item?.id}`)
           if(data?.success){
             getAllPodiumFeatures()
             ToatComp({message:data?.message,type:"Success"})
           }
-      }}/></span>
+      }}/>}
+      </span>
     </div>
 
     </div>

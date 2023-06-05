@@ -1,34 +1,48 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {FC, useEffect} from 'react'
+import {FC, useEffect,useState} from 'react'
 import {useMutation, useQueryClient} from 'react-query'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import {MenuComponent} from '../../../../../../_metronic/assets/ts/components'
 import {ID, KTSVG, QUERIES} from '../../../../../../_metronic/helpers'
 import {useListView} from '../../core/ListViewProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
 import {deleteUser} from '../../core/_requests'
+import { useSelector } from 'react-redux'
+import { successMessage } from '../../../../../modules/auth/components/ToastComp'
 
 type Props = {
-  id: ID
+  id: ID,
+  data:any
 }
 
-const UserActionsCell: FC<Props> = ({id}) => {
+const UserActionsCell: FC<Props> = ({id,data}) => {
   const {setItemIdForUpdate} = useListView()
   const {query} = useQueryResponse()
   const queryClient = useQueryClient()
-
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const navigate=useNavigate()
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
   useEffect(() => {
     MenuComponent.reinitialization()
   }, [])
 
   const openEditModal = () => {
-    setItemIdForUpdate(id)
+    // setItemIdForUpdate(id)
+    navigate(`/quiz/update-quiz/${id}`)
   }
 
   const deleteItem = useMutation(() => deleteUser(id), {
     // 💡 response of the mutation is passed to onSuccess
     onSuccess: () => {
       // ✅ update detail view directly
+      successMessage("Quiz Details deleted Successfully")
       queryClient.invalidateQueries([`${QUERIES.USERS_LIST}-${query}`])
     },
   })
@@ -50,24 +64,26 @@ const UserActionsCell: FC<Props> = ({id}) => {
       >
         {/* begin::Menu item */}
         <div className='menu-item'>
-          <a className='menu-link px-3' onClick={openEditModal}>
+        {permissionList?.can_edit &&  <a className='menu-link px-3' onClick={openEditModal}>
             Edit
-          </a>
+          </a>}
         </div>
         {/* end::Menu item */}
 
         {/* begin::Menu item */}
         <div className='menu-item'>
-          <a
+         {permissionList?.can_delete && <a
             className='menu-link px-3'
             data-kt-users-table-filter='delete_row'
             onClick={async () => await deleteItem.mutateAsync()}
           >
             Delete
-          </a>
+          </a>}
         </div>
 
         <div className='menu-item'>
+         {
+          permissionList?.can_create && permissionList?.can_edit &&
           <Link
             to={`/quiz/add-question/${id}`}
             className='menu-link px-3'
@@ -76,8 +92,11 @@ const UserActionsCell: FC<Props> = ({id}) => {
           >
             Add Question
           </Link>
+          }
         </div>
         <div className='menu-item'>
+          {
+            permissionList?.can_view && new Date(data?.dates?.result_publish_date) < new Date() && 
           <Link
             to={`/quiz/view-question/${id}`}
             className='menu-link px-3'
@@ -85,7 +104,7 @@ const UserActionsCell: FC<Props> = ({id}) => {
             // onClick={}
           >
             View Question
-          </Link>
+          </Link>}
         </div>
         {/* end::Menu item */}
       </div>

@@ -3,12 +3,12 @@ import {UserEditModalHeader} from './UserEditModalHeader'
 import {UserEditModalFormWrapper} from './UserEditModalFormWrapper'
 
 const UserEditModal = () => {
-  useEffect(() => {
-    document.body.classList.add('modal-open')
-    return () => {
-      document.body.classList.remove('modal-open')
-    }
-  }, [])
+  // useEffect(() => {
+  //   document.body.classList.add('modal-open')
+  //   return () => {
+  //     document.body.classList.remove('modal-open')
+  //   }
+  // }, [])
 
   return (
     <>

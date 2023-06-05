@@ -1,30 +1,38 @@
 import {FC, useState, createContext, useContext, useMemo, useEffect} from 'react'
-import {getAllCategories} from '../category-list/core/_requests'
-import {getAllCourses} from '../course-list/core/_requests'
+import { useParams } from 'react-router-dom'
+import { getAllSubjects } from '../../quiz/users-list/core/_requests'
+import axios from 'axios'
+import { getAllCategories } from '../category-list/core/_requests'
+import { getAllCourses } from '../course-list/core/_requests'
 const CommonDataContext = createContext<any>({
-  allCourses: [],
-  allCategories: [],
+  allCategory: [],
+  getAllCourses:[]
 })
 
 const CommonDataProvider: FC = ({children}) => {
-  const [allCourses, setCourses] = useState<Array<any>>()
-  const [allCategories, setCategories] = useState<Array<any>>()
+  const [allCategory, setAllCategory] = useState<Array<any>>()
+  const [allCourses, setAllCourses] = useState<Array<any>>()
 
   useEffect(() => {
     getData()
   }, [])
 
+
+
   const getData = async () => {
-    await getAllCourses()
+    await getAllCategories()
       .then((data) => {
-        setCourses(data)
+        setAllCategory(data)
       })
       .catch((err) => {
         console.log(err)
       })
-    await getAllCategories()
+
+
+
+      await getAllCourses()
       .then((data) => {
-        setCategories(data)
+        setAllCourses(data)
       })
       .catch((err) => {
         console.log(err)
@@ -34,8 +42,8 @@ const CommonDataProvider: FC = ({children}) => {
   return (
     <CommonDataContext.Provider
       value={{
-        allCourses,
-        allCategories,
+        allCategory,
+        allCourses
       }}
     >
       {children}

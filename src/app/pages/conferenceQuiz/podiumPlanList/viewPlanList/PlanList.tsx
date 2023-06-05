@@ -13,6 +13,7 @@ import {  APIURLQUIZ } from '../../APIURL';
 import { AiFillEdit } from 'react-icons/ai';
 import Switch from '@mui/material/Switch';
 import ToastComp from '../../userList/ToastComp';
+import { useSelector } from 'react-redux';
 
 
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
@@ -23,6 +24,7 @@ const PlanList = () => {
     const [planCategoryData,setPlanCategorydata]=useState<Array<any[]>>([])
    const [selectCategory,setSelectCategory]=useState<any>("")
     const [plan,setPlan]=useState<Array<any[]>>([])
+
     const [logoCustomization,setLogoCustomization]=useState<any>({
       value: 'YES', label: 'YES'
     })
@@ -53,6 +55,15 @@ const PlanList = () => {
       { value: "true", label: "true" },
       { value: "false", label: "false" },
     ];
+    const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+    const [permissionList,setPermissionList]=useState<any>({})
+    const filterStaffPermission=async (title:string)=>{
+      let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+      setPermissionList(result[0])
+    }
+    useEffect(()=>{
+      filterStaffPermission(navItem?.item)
+      },[navItem])
     const onOpenModal = (row:any) => {
       setEditPlan({...row})
       setLogoCustomization({value:row.logo_customization,label:row.logo_customization})
@@ -135,7 +146,7 @@ const PlanList = () => {
           id: 7,
           name: "Actions",
           selector: (row:any) => <AiFillEdit style={{color:"#777ea0",fontSize:"25px"}} onClick={()=>{
-              onOpenModal(row)
+             (permissionList?.can_edit || permissionList?.can_delete) && onOpenModal(row)
           }}/>,
           sortable: true,
           reorder: true
@@ -217,13 +228,13 @@ const PlanList = () => {
                                     }} />
                       <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
               
-               <button className="btn btn-primary" onClick={()=>{
+              {permissionList?.can_create && <button className="btn btn-primary" onClick={()=>{
                      navigate("/conference-quiz/podium/create-new-plan")
-               }}>Create New Plan</button>
+               }}>Create New Plan</button>}
              </div>
              <div className="col-12 mt-5">
               {
-                plan?.length>0 ? <DataTable
+               permissionList?.can_view && plan?.length>0 ? <DataTable
                 title=""
                 columns={columns}
                 data={plan}
@@ -392,15 +403,15 @@ const PlanList = () => {
                      
   
                       <div className="col-12 d-flex flex-column">
-              <button className="btn btn-success w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
+             {permissionList?.can_edit && <button className="btn btn-success w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
                    e?.preventDefault()
                    checkValidation()
-              }}>Update Plan</button>
-               <button className="btn btn-danger w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
+              }}>Update Plan</button>}
+              {permissionList?.can_delete && <button className="btn btn-danger w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
                    e?.preventDefault()
                    deletePlan()
                   //  checkValidation()
-              }}>Delete Plan</button>
+              }}>Delete Plan</button>}
               </div>
               </div>
             

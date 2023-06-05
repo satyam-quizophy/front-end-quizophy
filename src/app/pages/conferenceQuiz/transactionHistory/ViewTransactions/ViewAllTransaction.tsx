@@ -10,13 +10,22 @@ import Select from 'react-select'
 import { useNavigate } from 'react-router-dom';
 import {  APIURLQUIZ } from '../../APIURL';
 import { AiFillEdit } from 'react-icons/ai';
+import { useSelector } from 'react-redux';
 
 const ViewAllTransaction = () => {
   
     const [transaction,setTransaction]=useState<Array<any[]>>([])
     
     const navigate=useNavigate()
-   
+    const [permissionlist,setPermissionList]=useState<any>()
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
     const findAllTransactions=async ()=>{
          const {data}=await axios.get(`${APIURLQUIZ}/admin/get-all-transaction`)
          setTransaction(data?.data)
@@ -81,7 +90,7 @@ const ViewAllTransaction = () => {
             id: 7,
             name: "Actions",
             selector: (row:any) => <AiFillEdit style={{color:"#777ea0",fontSize:"25px"}} onClick={()=>{
-                navigate(`/conference-quiz/podium/update-transaction/${row?.id}`,{state:{row}})
+              (permissionlist?.can_edit || permissionlist?.can_delete) &&  navigate(`/conference-quiz/podium/update-transaction/${row?.id}`,{state:{row}})
             }}/>,
             sortable: true,
             reorder: true
@@ -100,14 +109,14 @@ const ViewAllTransaction = () => {
           <div className="row">
 
           <div className="col-12 text-center d-flex" style={{justifyContent:"flex-end"}}>
-             <button className="btn btn-primary" onClick={()=>{
+           {permissionlist?.can_create &&  <button className="btn btn-primary" onClick={()=>{
                    navigate("/conference-quiz/podium/create-new-transaction")
-             }}>Create New Transaction</button>
+             }}>Create New Transaction</button>}
            </div>
             
              <div className="col-12 mt-5">
               {
-                transaction?.length>0 ? <DataTable
+              permissionlist?.can_view &&  transaction?.length>0 ? <DataTable
                 title=""
                 columns={columns}
                 data={transaction}

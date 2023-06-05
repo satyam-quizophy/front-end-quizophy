@@ -19,7 +19,7 @@ const UsersListGrouping = () => {
     onSuccess: () => {
       // ✅ update detail view directly
       // queryClient.invalidateQueries([`${QUERIES.USERS_LIST}-${query}`])
-      getUsers(query)
+      getUsers(params.id,query)
       clearSelected()
       window.location.reload()
     },
@@ -31,7 +31,7 @@ const UsersListGrouping = () => {
       
       // ✅ update detail view directly
       // queryClient.invalidateQueries([`${QUERIES.USERS_LIST}-${query}`])
-      getUsers(query)
+      getUsers(params.id,query)
       clearSelected()
       window.location.reload()
 

@@ -6,6 +6,7 @@ import axios, {AxiosResponse} from 'axios'
 import {API_URL} from '../../../settings/components/ApiUrl'
 import Select from 'react-select'
 import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css';
 
 type Props = {
   setFieldValue: any

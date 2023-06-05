@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { APIURLAUTH } from '../APIURL';
 import { AiFillEdit } from 'react-icons/ai';
 import ToastComp from './ToastComp';
+import { useSelector } from 'react-redux';
 const UserList = () => {
   const [open, setOpen] = useState(false);
   const [editUser,setEditUser]=useState<any>({})
@@ -25,7 +26,15 @@ const UserList = () => {
 
   const navigate=useNavigate()
   const options = useMemo(() => countryList().getData(), [])
-  
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
 
   const onOpenModal = (row:any) => {
     setEditUser({...row})
@@ -73,7 +82,7 @@ const UserList = () => {
       id: 5,
       name: "Actions",
       selector: (row:any) => <AiFillEdit style={{color:"#777ea0",fontSize:"25px"}} onClick={()=>{
-          onOpenModal(row)
+           onOpenModal(row)
       }}/>,
       sortable: true,
       reorder: true
@@ -134,13 +143,13 @@ const UserList = () => {
     <div className="container">
         <div className="row">
            <div className="col-12 text-center d-flex" style={{justifyContent:"flex-end"}}>
-             <button className="btn btn-primary" onClick={()=>{
+            {permissionList?.can_create &&  <button className="btn btn-primary" onClick={()=>{
                    navigate("/conference-quiz/user/create-new-user")
-             }}>Create New User</button>
+             }}>Create New User</button>}
            </div>
            <div className="col-12 mt-5">
            {
-            user?.length>0 ? <DataTable
+           permissionList?.can_view && user?.length>0 ? <DataTable
                   title=""
                   columns={columns}
                   data={user}
@@ -211,15 +220,15 @@ const UserList = () => {
             <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
            
             <div className="col-12 d-flex flex-column">
-            <button className="btn btn-success w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
+           {permissionList?.can_edit && <button className="btn btn-success w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
                  e?.preventDefault()
                  checkValidation()
-            }}>Update User</button>
-             <button className="btn btn-danger w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
+            }}>Update User</button>}
+            {permissionList?.can_delete && <button className="btn btn-danger w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
                  e?.preventDefault()
                  deleteUser()
                 //  checkValidation()
-            }}>Delete User</button>
+            }}>Delete User</button>}
             </div>
            
           </div>

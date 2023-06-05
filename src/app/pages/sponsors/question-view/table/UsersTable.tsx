@@ -9,6 +9,7 @@ import {UsersListLoading} from '../components/loading/UsersListLoading'
 import {UsersListPagination} from '../components/pagination/UsersListPagination'
 import {KTCardBody} from '../../../../../_metronic/helpers'
 import {useParams} from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const UsersTable = () => {
   const params = useParams()
@@ -22,6 +23,16 @@ const UsersTable = () => {
     columns,
     data,
   })
+
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
 
   return (
     <KTCardBody className='py-4'>
@@ -39,8 +50,8 @@ const UsersTable = () => {
             </tr>
           </thead>
           <tbody className='text-gray-600 fw-bold' {...getTableBodyProps()}>
-            {rows.length > 0 ? (
-              rows.map((row: Row<User>, i) => {
+            {permissionList?.can_view && rows?.length > 0 ? (
+              rows?.map((row: Row<User>, i) => {
                 prepareRow(row)
                 return <CustomRow row={row} key={`row-${i}-${row.id}`} />
               })

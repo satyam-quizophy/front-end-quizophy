@@ -5,9 +5,9 @@ const API_URL_STAFF = window.location.host==="localhost:3011"?"http://localhost:
 const LOCAL_API_URL = process.env.API_URL
 
 export const GET_USER_BY_ACCESSTOKEN_URL = `https://preview.keenthemes.com/metronic8/laravel/api/verify_token`
-export const LOGIN_URL = `https://quiz.datacubeindia.com/api/common/staff/login`
-export const VERIFY_URL = `https://quiz.datacubeindia.com/api/common/staff/verifyOtp`
-export const RESEND_URL = `https://quiz.datacubeindia.com/api/common/staff/resendOtp`
+export const LOGIN_URL = `https://quiz.quizophy.com/api/common/staff/login`
+export const VERIFY_URL = `https://quiz.quizophy.com/api/common/staff/verifyOtp`
+export const RESEND_URL = `https://quiz.quizophy.com/api/common/staff/resendOtp`
 export const REGISTER_URL = `${API_URL_STAFF}/register`
 export const REQUEST_PASSWORD_URL = `${API_URL_STAFF}/forgot-password`
 export const RESET_PASSWORD_URL = `${API_URL_STAFF}/reset-password`

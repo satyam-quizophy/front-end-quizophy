@@ -17,6 +17,7 @@ import {Spinwin} from './components/Spinwin'
 import {Email} from './components/Email'
 import QuizophyAwsSetting from './components/QuizophyAwsSetting'
 import PathMiddleWare from '../middleware/PathMiddleWare'
+import AsideMenuStatus from './components/AsideMenuStatus'
 
 const chatBreadCrumbs: Array<PageLink> = [
   {
@@ -178,6 +179,15 @@ const SettingPage = () => {
             <>
               <PageTitle breadcrumbs={chatBreadCrumbs}>Email Setting</PageTitle>
              <PathMiddleWare> <Email /></PathMiddleWare>
+            </>
+          }
+        />
+        <Route
+          path='aside-menu-status'
+          element={
+            <>
+              <PageTitle breadcrumbs={chatBreadCrumbs}>Aside Menu Status</PageTitle>
+              <PathMiddleWare><AsideMenuStatus /></PathMiddleWare>
             </>
           }
         />

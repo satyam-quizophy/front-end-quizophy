@@ -12,9 +12,11 @@ export type User = {
   marks?: number
   language?: string
   courses?: any
-  dates?: object
+  dates?: any
   prize?: any
   questions?: any
+  question_choices?:any,
+  question_added_to_quiz_type?:any
 }
 
 export type UsersQueryResponse = Response<Array<User>>

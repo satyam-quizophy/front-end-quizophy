@@ -1,13 +1,29 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {FC, useEffect} from 'react'
+import React, {FC, useEffect, useRef, useState} from 'react'
 import {KTSVG, toAbsoluteUrl} from '../../../../../_metronic/helpers'
 import {ChatInner} from '../../../../../_metronic/partials/chat/ChatInner'
 import {useListView} from '../core/ListViewProvider'
 import {UserEditModalFormWrapper} from './UserEditModalFormWrapper'
+import { getUserById } from '../core/_requests'
 
 const OpenDrawer: FC = () => {
-  const {setItemIdForUpdate} = useListView()
+  const {setItemIdForUpdate,itemIdForUpdate} = useListView()
+  const [roleForEdit, setRoleForEdit] = useState<any>({
+    course_name:"",
+    image:"",
+    position:undefined
+  })
+  const closeDrawerRef: any = useRef(null)
 
+  const getCouseById=async (id:any)=>{
+     const data=await getUserById(id)
+     setRoleForEdit({...data?.data?.data})
+  }
+  useEffect(() => {
+    if(itemIdForUpdate!==undefined){
+        getCouseById(itemIdForUpdate)
+    }
+  },[])
   return (
     <>
       <div
@@ -53,7 +69,7 @@ const OpenDrawer: FC = () => {
             </div>
           </div>
           <div className='modal-body scroll-y mx-5 mx-xl-15'>
-            <UserEditModalFormWrapper />
+            <UserEditModalFormWrapper  data={roleForEdit}/>
           </div>
         </div>
       </div>

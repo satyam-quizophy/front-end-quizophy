@@ -18,7 +18,9 @@ import Dropzone from 'react-dropzone';
 import { QUIZOPHY_WEBSITE_API_URL } from '../ApiUrl';
 import { APIURLQUIZ } from '../../conferenceQuiz/APIURL';
 import ToatComp from '../blog/ToatComp';
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { useSelector } from 'react-redux';
 
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
@@ -37,8 +39,29 @@ export default function Testimonials() {
     const [testimonialImage,setTestimonialImage]=useState<string>("")
 
   const [testimonials,setTestimonials]=useState<any[]>([])
-
-  
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
+  const modules = {
+    toolbar: [
+        [{header:[1,2,3,4,5,6,false]     
+        }],
+        [{ 'color': [] }, { 'background': [] }], 
+      [{size: []}],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, 
+       {'indent': '-1'}, {'indent': '+1'}],
+      ['link','image', 'video'],
+      [{ 'align': [] }],
+      ['clean']
+    ],
+}
   const uploadImage = async (file: any) => {
     const fd = new FormData()
     if(Math.ceil( ( (file[0].size * 8) / 8) / 1000 )>1024){
@@ -93,16 +116,16 @@ export default function Testimonials() {
     <div className="container mt-0">
          
               <div className="row d-flex justify-content-end my-5 mb-5">
-              <button className="btn btn-primary" style={{width:"250px"}} onClick={()=>{
+             {permissionList?.can_create &&  <button className="btn btn-primary" style={{width:"250px"}} onClick={()=>{
                 setEditTestimonial(null)
                 setOpen(true)
-               }}>Add More Testimonial</button>
+               }}>Add More Testimonial</button> }
               </div>
 
               <div className="gy-5" style={{display:"flex", flexWrap:"wrap", flexDirection:"row",justifyContent:"space-evenly"}}>
               {
 
-testimonials?.length>0 ?
+permissionList?.can_view && testimonials?.length>0 ?
 testimonials.map((item,index)=>{
     return    <div key={index} className="card m-4" style={{maxWidth: "25rem",boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
         <div style={{width:"100px",height:"100px",borderRadius:"100%",margin:"10px auto"}}>
@@ -114,17 +137,17 @@ testimonials.map((item,index)=>{
 
       <h6 className="card-text">Speak Up : <span className="text-primary">{item?.speakUp}</span></h6>
       <div className="w-100" style={{display:"flex",justifyContent:"flex-end",margin:"30px auto 3px auto"}}>
-        <span><AiFillEdit style={{color:"black",fontSize:"20px",marginRight:"10px",cursor:"pointer"}} onClick={()=>{
+        <span>{permissionList?.can_edit && <AiFillEdit style={{color:"black",fontSize:"20px",marginRight:"10px",cursor:"pointer"}} onClick={()=>{
           setTestimonialImage(item?.image)
             onOpenModal(item)
-      }}/>
-      <AiFillDelete style={{color:"red",fontSize:"20px",cursor:"pointer"}} onClick={async ()=>{
+      }}/>}
+      {permissionList?.can_delete && <AiFillDelete style={{color:"red",fontSize:"20px",cursor:"pointer"}} onClick={async ()=>{
           const {data}=await axios.delete(`${QUIZOPHY_WEBSITE_API_URL}/testimonial/${item?.id}`)
           if(data?.success){
             getAllTestimonials()
             ToatComp({message:data?.message,type:"Success"})
           }
-      }}/></span>
+      }}/>}</span>
     </div>
 
     </div>

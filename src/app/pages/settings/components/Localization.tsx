@@ -6,39 +6,46 @@ import { API_URL } from '../../staff-management/users-list/core/_requests'
 import {Button} from './Button'
 import {SettingsName} from './SettingsName'
 import { errrorMessage, successMessage } from '../../../modules/auth/components/ToastComp'
-let typeArr=["date_format","default_language","time_format","default_timezone"]
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 const Localization: FC = () => {
-  const [values, setValue] = useState<Array<any[]>>()
-
+  const [values, setValue] = useState<any>()
+  const [name,setName]=useState<any>()
+  const navigate=useNavigate()
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+    if(!result[0]?.can_view){
+       navigate("/dashboard")
+    }
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem.item)
+    },[])
   useEffect(() => {
     getInfo()
   }, [])
 
   const getInfo = async () => {
-    const {data}=await axios.get(`${API_URL}/option`)
-    if(data?.success){
-      setValue(data?.data)
-    }
+    const {data}=await axios.get(`${API_URL}/option/company_localization`)
+     setName(data?.name)
+      setValue(data?.value)
+    
   }
 
   const onSubmit = async (e: any) => {
-    e.preventDefault()
-    let dataTrueOrFalse=values?.some((item:any)=>{
-      if(typeArr?.includes(item?.name)){
-           return !item?.value?.trim() || item?.value?.trim()===""
-      }
-  })
-  if(dataTrueOrFalse){
-    errrorMessage("All Fields Are Required")
-  }else{
-     const {data}=await axios.put(`${API_URL}/option`,values)
+    e.preventDefault()   
+
+     const {data}=await axios.put(`${API_URL}/option`,{name,value:values})
      if(data?.success){
       getInfo()
-      successMessage(data?.message)
+      successMessage("Company Localization Updated Successfully")
      }else{
       errrorMessage(data?.message)
      }
-  }
+  
   }
 
   return (
@@ -47,26 +54,21 @@ const Localization: FC = () => {
       <div className='flex-lg-row-fluid ms-lg-7 ms-xl-10'>
         <div className='card p-10' id='kt_chat_messenger'>
           <form noValidate className='form row' onSubmit={onSubmit}>
-            {
-              values?.map((item:any,index:number)=>{
-                 return  typeArr?.includes(item?.name) && <div key={index} className='col-6 mb-5'>
-                <label className='required fw-bold fs-6 mb-2'>{item?.name}</label>
+            <div  className='col-6 mb-5'>
+                <label className='required fw-bold fs-6 mb-2'>Date Format</label>
                 <select
-                  name='date_format'
-                  placeholder='Select a date format'
+                  placeholder='Select Date Format'
+                  name={`Date_Format`}
                   onChange={(e:any)=>{
-                    let newArr:any[]=[...values]
-                    newArr[index].value=e?.target?.value
-                    setValue(newArr)
+                     setValue({...values,[e?.target?.name]:e?.target?.value})
                   }}
-                  value={item?.value}
+                  value={values?.Date_Format}
                   className={clsx(
                     'form-select mb-3 mb-lg-0',
                   )}
                   autoComplete='off'
                 >
-                {
-                  item?.name==="date_format" && <>  
+               
                   <option>yyyy-mm-dd</option>
                   <option>yyyy/mm/dd</option>
                   <option>yyyy.mm.dd</option>
@@ -76,16 +78,24 @@ const Localization: FC = () => {
                   <option>mm-dd-yyyy</option>
                   <option>mm.dd.yyyy</option>
                   <option>mm/dd/yyyy</option>
-                  </>
-                }
-                {
-                  item?.name==="time_format" && <>  
-                  <option>24 hours</option>
-                  <option>12 hours</option></>
-                }
-                {
-                  item?.name==="default_timezone" && <>  
-                      <option>yyyy-mm-dd</option>
+                  </select>
+          </div>
+          <div  className='col-6 mb-5'>
+                <label className='required fw-bold fs-6 mb-2'>Deafult Timezone</label>
+                <select
+                  placeholder='Select TimeZone'
+                  name={`Default_Timezone`}
+                  onChange={(e:any)=>{
+                     setValue({...values,[e?.target?.name]:e?.target?.value})
+                  }}
+                  value={values?.Default_Timezone}
+                  className={clsx(
+                    'form-select mb-3 mb-lg-0',
+                  )}
+                  autoComplete='off'
+                >
+               
+                  <option>yyyy-mm-dd</option>
                   <option>yyyy/mm/dd</option>
                   <option>yyyy.mm.dd</option>
                   <option>dd-mm-yyyy</option>
@@ -93,132 +103,52 @@ const Localization: FC = () => {
                   <option>dd.mm.yyyy</option>
                   <option>mm-dd-yyyy</option>
                   <option>mm.dd.yyyy</option>
-                  <option>mm/dd/yyyy</option></>
-                }
-                {
-                  item?.name==="default_language" && <>  
-                    <option>English</option>
-                  <option>Hindi</option></>
-                }
-
-                </select>
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              })
-            }
-            {/* <div className='d-flex flex-wrap gap-5 mb-10'>
-              <div className='fv-row w-100 flex-md-root'>
-                <label className='required fw-bold fs-6 mb-2'>Date Format</label>
-                <select
-                  name='date_format'
-                  value={values.date_format}
-                  placeholder='Select a date format'
-                  onChange={onChange}
-                  className={clsx(
-                    'form-select mb-3 mb-lg-0',
-                  )}
-                  autoComplete='off'
-                >
-                  <option>d-m-Y</option>
-                  <option>d/m/Y</option>
-                  <option>d.m.Y</option>
-                  <option>m-d-Y</option>
-                  <option>m.d.Y</option>
-                  <option>m/d/Y</option>
-                  <option>Y-m-d</option>
-                  <option>Y/m/d</option>
-                  <option>Y.m.d</option>
-                </select>
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className='fv-row w-100 flex-md-root'>
+                  <option>mm/dd/yyyy</option>
+                  </select>
+          </div>
+          <div  className='col-6 mb-5'>
                 <label className='required fw-bold fs-6 mb-2'>Time Format</label>
                 <select
-                  placeholder='Enter a domain name'
-                  name='time_format'
-                  value={values.time_format}
-                  onChange={onChange}
+                 name={`Time_Format`}
+                 onChange={(e:any)=>{
+                    setValue({...values,[e?.target?.name]:e?.target?.value})
+                 }}
+                 value={values?.Time_Format}
+                  placeholder='Select Time Format'
+                 
                   className={clsx(
                     'form-select mb-3 mb-lg-0',
                   )}
                   autoComplete='off'
                 >
+               
                   <option>24 hours</option>
                   <option>12 hours</option>
-                </select>
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className='d-flex flex-wrap gap-5 mb-10'>
-              <div className='fv-row w-100 flex-md-root'>
-                <label className='required fw-bold fs-6 mb-2'>Default Timezone</label>
-                <select
-                  placeholder='Enter allowed file types'
-                  name='timezone'
-                  value={values.timezone}
-                  onChange={onChange}
-                  className={clsx(
-                    'form-select mb-3 mb-lg-0',
-                  )}
-                  autoComplete='off'
-                >
-                 <option>d-m-Y</option>
-                  <option>d/m/Y</option>
-                  <option>d.m.Y</option>
-                  <option>m-d-Y</option>
-                  <option>m.d.Y</option>
-                  <option>m/d/Y</option>
-                  <option>Y-m-d</option>
-                  <option>Y/m/d</option>
-                  <option>Y.m.d</option>
-                </select>
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className='fv-row w-100 flex-md-root'>
+                  </select>
+          </div>
+          <div  className='col-6 mb-5'>
                 <label className='required fw-bold fs-6 mb-2'>Default Language</label>
                 <select
-                  placeholder='Enter allowed file types'
-                  name='language'
-                  value={values.language}
-                  onChange={onChange}
+                  name={`Default_Language`}
+                  onChange={(e:any)=>{
+                    setValue({...values,[e?.target?.name]:e?.target?.value})
+                  }}
+                  value={values?.Default_Language}  
+                placeholder='Select Laguage'
+                
                   className={clsx(
                     'form-select mb-3 mb-lg-0',
                   )}
                   autoComplete='off'
                 >
+               
                   <option>English</option>
                   <option>Hindi</option>
-                </select>
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div> */}
+                  </select>
+          </div>
+            
 
-            <Button />
+           {permissionList?.can_edit && <Button />}
           </form>
         </div>
       </div>

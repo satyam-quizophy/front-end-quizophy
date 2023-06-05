@@ -6,10 +6,11 @@ import {User} from '../../core/_models'
 import {SubjectCell} from './SubjectCell'
 import {Type} from './Type'
 import { Marks } from './Marks'
+import { NegativeMarks } from './NegativeMarks'
 
 const usersColumns: ReadonlyArray<Column<User>> = [
   {
-    Header: (props) => <UserCustomHeader tableProps={props} title='ID' className='min-w-125px' />,
+    Header: (props) => <UserCustomHeader tableProps={props} title='Q.BANK.ID' className='min-w-125px' />,
     accessor: 'id',
   },
   {
@@ -19,6 +20,7 @@ const usersColumns: ReadonlyArray<Column<User>> = [
     id: 'questions',
     Cell: ({...props}) => <UserInfoCell user={props.data[props.row.index]} />,
   },
+  
   {
     Header: (props) => (
       <UserCustomHeader tableProps={props} title='Subject' className='min-w-125px' />
@@ -44,6 +46,13 @@ const usersColumns: ReadonlyArray<Column<User>> = [
     ),
     id: 'marks',
     Cell: ({...props}) => <Marks marks={props.data[props.row.index].marks} />,
+  },
+  {
+    Header: (props) => (
+      <UserCustomHeader tableProps={props} title='Negative Marks' className='min-w-125px' />
+    ),
+    id: 'negative_marks',
+    Cell: ({...props}) => <NegativeMarks marks={props.data[props.row.index].marks} />,
   },
 ]
 

@@ -3,12 +3,21 @@ import {QUERIES} from '../../../../../../_metronic/helpers'
 import {useListView} from '../../core/ListViewProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
 import {deleteSelectedUsers} from '../../core/_requests'
-
+import {useState,useEffect} from "react"
+import { useSelector } from 'react-redux'
 const UsersListGrouping = () => {
   const {selected, clearSelected} = useListView()
   const queryClient = useQueryClient()
   const {query} = useQueryResponse()
-
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
   const deleteSelectedItems = useMutation(() => deleteSelectedUsers(selected), {
     // 💡 response of the mutation is passed to onSuccess
     onSuccess: () => {
@@ -24,13 +33,13 @@ const UsersListGrouping = () => {
         <span className='me-2'>{selected.length}</span> Selected
       </div>
 
-      <button
+     {permissionList?.can_delete && <button
         type='button'
         className='btn btn-danger'
         onClick={async () => await deleteSelectedItems.mutateAsync()}
       >
         Delete Selected
-      </button>
+      </button>}
     </div>
   )
 }

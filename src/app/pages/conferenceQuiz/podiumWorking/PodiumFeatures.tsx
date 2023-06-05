@@ -19,6 +19,7 @@ import Dropzone from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select'
 import ToastComp from '../userList/ToastComp';
+import { useSelector } from 'react-redux';
 
 
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
@@ -60,6 +61,16 @@ const [filterPodiumCategory,setFilterPodiumCategory] =useState<any[]>([])
     // console.log(filterCategory)
 
   }
+
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+    const [permissionList,setPermissionList]=useState<any>({})
+    const filterStaffPermission=async (title:string)=>{
+      let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+      setPermissionList(result[0])
+    }
+    useEffect(()=>{
+      filterStaffPermission(navItem?.item)
+      },[navItem])
   const uploadImage = async (file: any) => {
     const fd = new FormData()
     if(Math.ceil( ( (file[0].size * 8) / 8) / 1000 )>1024){
@@ -136,15 +147,15 @@ const [filterPodiumCategory,setFilterPodiumCategory] =useState<any[]>([])
                                       
                                     }} />
                       <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
-              <button className="btn btn-primary" style={{width:"250px",height:"43px"}} onClick={()=>{
+              {permissionList?.can_create && <button className="btn btn-primary" style={{width:"250px",height:"43px"}} onClick={()=>{
                 setEditFeatures(null)
                 setOpen(true)
-               }}>Add More Features</button>
+               }}>Add More Features</button>}
               </div>
 
               <div className="gy-5" style={{display:"flex", flexWrap:"wrap", flexDirection:"row",justifyContent:"space-evenly"}}>
               {
-filterPodiumCategory?.length>0 ?
+permissionList?.can_view &&  filterPodiumCategory?.length>0 ?
 filterPodiumCategory.map((item,index)=>{
     return    <div key={index} className="card m-4 col-md-4" style={{boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px"}}>
         <div style={{width:"90%",height:"200px",margin:"10px auto"}}>
@@ -162,17 +173,18 @@ filterPodiumCategory.map((item,index)=>{
       }
 
       <div className="w-100" style={{display:"flex",justifyContent:"flex-end",margin:"30px auto 3px auto"}}>
-        <span><AiFillEdit style={{color:"black",fontSize:"20px",marginRight:"10px",cursor:"pointer"}} onClick={()=>{
+        <span>
+          {permissionList?.can_edit && <AiFillEdit style={{color:"black",fontSize:"20px",marginRight:"10px",cursor:"pointer"}} onClick={()=>{
             setFeaturesImage(item?.image)
             onOpenModal(item)
-      }}/>
-      <AiFillDelete style={{color:"red",fontSize:"20px",cursor:"pointer"}} onClick={async ()=>{
+      }}/>}
+    {permissionList?.can_delete &&  <AiFillDelete style={{color:"red",fontSize:"20px",cursor:"pointer"}} onClick={async ()=>{
           const {data}=await axios.delete(`${APIURLQUIZ}/admin/deleteFeaturesById/${item?.id}`)
           if(data?.success){
             getAllPodiumFeatures()
             ToastComp({message:data?.message,type:"Success"})
           }
-      }}/></span>
+      }}/>}</span>
     </div>
 
     </div>

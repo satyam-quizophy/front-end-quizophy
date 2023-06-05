@@ -3,6 +3,8 @@ import {PageLink, PageTitle} from '../../../_metronic/layout/core'
 import {QuestionListWrapper} from './question-list/QuestionList'
 import {QuestionViewWrapper} from './question-view/QuestionView'
 import {UsersListWrapper} from './users-list/UsersList'
+import CreateUpdateQuiz from './users-list/CreateUpdateQuiz'
+import { CommonDataProvider } from './commonData/CommonDataProvider'
 
 const usersBreadcrumbs: Array<PageLink> = [
   {
@@ -37,7 +39,25 @@ const Quiz = () => {
           element={
             <>
               <PageTitle breadcrumbs={usersBreadcrumbs}>Questions list</PageTitle>
-              <QuestionListWrapper />
+              <CommonDataProvider><QuestionListWrapper /></CommonDataProvider> 
+            </>
+          }
+        />
+        <Route
+          path='create-quiz'
+          element={
+            <>
+              <PageTitle breadcrumbs={usersBreadcrumbs}>create New Quiz</PageTitle>
+              <CommonDataProvider><CreateUpdateQuiz /></CommonDataProvider>
+            </>
+          }
+        />
+         <Route
+          path='update-quiz/:id'
+          element={
+            <>
+              <PageTitle breadcrumbs={usersBreadcrumbs}>Update Quiz</PageTitle>
+              <CommonDataProvider><CreateUpdateQuiz /></CommonDataProvider>
             </>
           }
         />
@@ -46,7 +66,7 @@ const Quiz = () => {
           element={
             <>
               <PageTitle breadcrumbs={usersBreadcrumbs}>Questions list</PageTitle>
-              <QuestionViewWrapper />
+              <CommonDataProvider><QuestionViewWrapper /></CommonDataProvider>
             </>
           }
         />

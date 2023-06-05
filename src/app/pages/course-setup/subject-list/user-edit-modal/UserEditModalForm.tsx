@@ -3,7 +3,7 @@ import {ErrorMessage, Field, Form, Formik, FormikValues} from 'formik'
 import {createAccountSchemas, initialUser, User} from '../core/_models'
 import {useListView} from '../core/ListViewProvider'
 import {UsersListLoading} from '../components/loading/UsersListLoading'
-import {createUser} from '../core/_requests'
+import {createUser, getUserById} from '../core/_requests'
 import {useQueryResponse} from '../core/QueryResponseProvider'
 import Swal from 'sweetalert2'
 import {useCommonData} from '../../commonData/CommonDataProvider'
@@ -15,8 +15,8 @@ type Props = {
 }
 
 const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
-  const {allCourses, allCategories} = useCommonData()
-  const {setItemIdForUpdate} = useListView()
+  const {allCourses} = useCommonData()
+  const {setItemIdForUpdate,itemIdForUpdate} = useListView()
   const {refetch} = useQueryResponse()
   const [currentSchema, setCurrentSchema] = useState(createAccountSchemas[0])
   const [selectedCourses, setSelectedCourses] = useState<any>(null)
@@ -29,13 +29,27 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
   })
 
   useEffect(() => {
-    if (roleForEdit.id && allCategories.length > 0) {
-      const selected = allCategories.filter((x: any) =>
-        roleForEdit?.courses.some((y: any) => y.course_category_id == x.id)
-      )
-      setSelectedCourses(selected)
+    // if (roleForEdit.id) {
+    //   console.log(allCourses)
+    //   console.log(roleForEdit.id)
+    //   // const selected = allCourses.filter((x: any) =>
+        
+    //   // )
+    //   // setSelectedCourses(selected)
+    // }
+    if(itemIdForUpdate){
+      getUserById(itemIdForUpdate).then((result:any)=>{
+        let ids=JSON.parse(result.course_ids)
+        let courses=allCourses.filter((item:any)=>ids.includes(item.id))
+        setSelectedCourses(courses)
+        setRoleForEdit({
+           ...roleForEdit,
+           id:result.id,
+           subject_name:result.subject_name
+        })
+      })
     }
-  }, [allCategories])
+  }, [itemIdForUpdate])
 
   const cancel = (withRefresh?: boolean) => {
     if (withRefresh) {
@@ -77,7 +91,7 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
                 <Select
                   isMulti
                   name='courses'
-                  options={allCategories}
+                  options={allCourses}
                   className='basic-multi-select'
                   classNamePrefix='select'
                   value={selectedCourses}
@@ -85,15 +99,16 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
                     setFieldValue('courses', e)
                     setSelectedCourses(e)
                   }}
+                  getOptionLabel={(option: any) => option.course_name}
                   getOptionValue={(option: any) => option.id}
-                  formatOptionLabel={(data: any) => {
-                    return (
-                      <div style={{display: 'flex'}}>
-                        <div>{data.courses.course_name}</div>
-                        <div style={{}}> - {data.course_category}</div>
-                      </div>
-                    )
-                  }}
+                  // formatOptionLabel={(data: any) => {
+                  //   return (
+                  //     <div style={{display: 'flex'}}>
+                  //       {/* <div>{data.courses.course_name}</div>
+                  //       <div style={{}}> - {data.course_category}</div> */}
+                  //     </div>
+                  //   )
+                  // }}
                 />
                 <div className='text-danger mt-2'>
                   <ErrorMessage name='courses' />

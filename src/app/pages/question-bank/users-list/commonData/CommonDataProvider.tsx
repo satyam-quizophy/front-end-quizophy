@@ -1,5 +1,6 @@
 import {FC, useState, createContext, useContext, useMemo, useEffect} from 'react'
-import {getAllCourses, getAllSubjects} from '../core/_requests'
+import {getAllCourses, getAllSubjects, getUserById} from '../core/_requests'
+import { useParams } from 'react-router-dom'
 const CommonDataContext = createContext<any>({
   allCourses: [],
   allSubjects: [],
@@ -8,10 +9,11 @@ const CommonDataContext = createContext<any>({
 const CommonDataProvider: FC = ({children}) => {
   const [allCourses, setCourses] = useState<Array<any>>()
   const [allSubjects, setSubjects] = useState<Array<any>>()
-
   useEffect(() => {
     getData()
   }, [])
+
+
 
   const getData = async () => {
     await getAllCourses()
@@ -34,7 +36,7 @@ const CommonDataProvider: FC = ({children}) => {
     <CommonDataContext.Provider
       value={{
         allCourses,
-        allSubjects,
+        allSubjects
       }}
     >
       {children}

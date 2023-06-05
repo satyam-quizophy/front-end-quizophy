@@ -53,22 +53,39 @@ const UserEditModalForm: FC<Props> = ({user, isUserLoading}) => {
       setSubmitting(true)
       try {
         if (isNotEmpty(values.id)) {
-          await updateUser(values)
+          const data=await updateUser(values)
+          if(data){
+            console.log(data)
+            Swal.fire({
+              title: 'Success!',
+              text: `Permission ${values.id ? 'Updated' : 'Created'}!`,
+              icon: 'success',
+              confirmButtonText: 'Okay',
+            })
+            setSubmitting(true)
+            cancel(true)
+          }
         } else {
-          await createUser(values)
+          const data=await createUser(values)
+          console.log(data)
+          if(data){
+            Swal.fire({
+              title: 'Success!',
+              text: `Permission ${values.id ? 'Updated' : 'Created'}!`,
+              icon: 'success',
+              confirmButtonText: 'Okay',
+            })
+            setSubmitting(true)
+            cancel(true)
+          }
         }
       } catch (ex) {
         console.error(ex)
-      } finally {
-        setSubmitting(true)
-        cancel(true)
-        Swal.fire({
-          title: 'Success!',
-          text: `Permission ${values.id ? 'Updated' : 'Created'}!`,
-          icon: 'success',
-          confirmButtonText: 'Okay',
-        })
-      }
+      } 
+      // finally {
+      //   setSubmitting(true)
+      //   cancel(true)
+      // }
     },
   })
 

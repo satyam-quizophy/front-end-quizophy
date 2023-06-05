@@ -15,6 +15,7 @@ import { MdOutlineAdd } from 'react-icons/md';
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
 import { API_URL } from '../../settings/components/ApiUrl';
+import { useSelector } from 'react-redux';
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 const CreateUpdateBlog = () => {
     const navigate=useNavigate()
@@ -23,6 +24,8 @@ const CreateUpdateBlog = () => {
     const [blogSlug,setBlogSlug]=useState<any>()
     const [value,setValue]=useState<any>()
     const [createNewCategory,setCreateNewcategory]=useState<boolean>(false)
+    const [blogImage,setblogImage]=useState<any>()
+    const params=useParams()
     const [createBlog,setCreateBlog]=useState<any>({
         title:"",
         description:"",
@@ -32,6 +35,17 @@ const CreateUpdateBlog = () => {
         category:""
     })
     const [blogCategory,setBlogCategory]=useState<any>()
+    const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+      const filterStaffPermission=async (title:string)=>{
+        let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+        if(params.id && !result[0]?.can_edit)
+          navigate("/quizophy-website/blog")
+          else if(!params.id && !result[0]?.can_create)
+          navigate("/quizophy-website/blog")
+      }
+      useEffect(()=>{
+        filterStaffPermission(navItem?.item)
+        },[navItem])
 	const getAllBlogCategory=async ()=>{
          const {data}=  await axios.get(`${API_URL}/option/website_blog_category`)
 		 setBlogCategory(data)
@@ -39,18 +53,18 @@ const CreateUpdateBlog = () => {
 	useEffect(()=>{
          getAllBlogCategory()
 	},[])
-    const [blogImage,setblogImage]=useState<any>()
-    const params=useParams()
 
     const modules = {
         toolbar: [
             [{header:[1,2,3,4,5,6,false]     
             }],
+            [{ 'color': [] }, { 'background': [] }], 
           [{size: []}],
           ['bold', 'italic', 'underline', 'strike', 'blockquote'],
           [{'list': 'ordered'}, {'list': 'bullet'}, 
            {'indent': '-1'}, {'indent': '+1'}],
-          ['link', 'image', 'video'],
+          ['link','image', 'video'],
+          [{ 'align': [] }],
           ['clean']
         ],
     }
@@ -62,6 +76,9 @@ const createNewBlog=async ()=>{
         ToatComp({message:"Please Enter Blog Description",type:"Error"})
        }else if(blogImage?.trim()==="" || !blogImage){
         ToatComp({message:"Please Enter Blog Image",type:"Error"})
+       }
+       else if(createBlog?.category?.trim()===""){
+        ToatComp({message:"Please Select Blog Category",type:"Error"})
        }
       else{
         const {data}=await axios.post(`${QUIZOPHY_WEBSITE_API_URL}/blog/add`,{...createBlog,author:currentUser?.first_name+" "+currentUser?.last_name,image:blogImage,slug:blogSlug,description:value})
@@ -78,6 +95,9 @@ const createNewBlog=async ()=>{
         ToatComp({message:"Please Enter Blog Description",type:"Error"})
        }else if(blogImage?.trim()===""){
         ToatComp({message:"Please Enter Blog Image",type:"Error"})
+       }
+       else if(editBlog?.category?.trim()===""){
+        ToatComp({message:"Please Select Blog Category",type:"Error"})
        }
        else{
         const {data}=await axios.put(`${QUIZOPHY_WEBSITE_API_URL}/blog/${params?.id}`,{...editBlog,image:blogImage,author:currentUser?.first_name+" "+currentUser?.last_name,slug:blogSlug,description:value})
@@ -178,6 +198,29 @@ const createNewBlog=async ()=>{
                                 <label className="required fs-6 fw-semibold text-primary">Blog Slug</label>
                              
                                 <input className="form_style form-control form-control-solid fw-bolder" style={{background:"#f2f2f2"}} disabled value={blogSlug} onChange={()=>{}} placeholder="Your Blog Slug" name="first-name"/>
+            <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
+
+            <div className="col-md-12 fv-row fv-plugins-icon-container mt-3">
+                                <label className="required fs-6 fw-semibold text-primary">Blog Meta Title</label>
+                             
+                                <input className="form_style form-control form-control-solid fw-bolder" style={{background:"#f2f2f2"}} value={editBlog?.id ? editBlog?.metaTitle :createBlog?.metaTitle}  onChange={(e:any)=>{
+                                    if(editBlog?.id){
+                                        setEditBlog({...editBlog,metaTitle:e?.target?.value})                                       
+                                    }else{
+                                        setCreateBlog({...createBlog,metaTitle:e?.target?.value})                                      
+                                    }
+                                }} placeholder="Enter Blog Meta Title" name="first-name"/>
+            <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
+            <div className="col-md-12 fv-row fv-plugins-icon-container mt-3">
+                                <label className="required fs-6 fw-semibold text-primary">Blog Meta Description</label>
+                             
+                                <input className="form_style form-control form-control-solid fw-bolder" style={{background:"#f2f2f2"}} value={editBlog?.id ? editBlog?.metaDescription :createBlog?.metaDescription}  onChange={(e:any)=>{
+                                    if(editBlog?.id){
+                                        setEditBlog({...editBlog,metaDescription:e?.target?.value})                                       
+                                    }else{
+                                        setCreateBlog({...createBlog,metaDescription:e?.target?.value})                                      
+                                    }
+                                }} placeholder="Enter Blog Meta Description" name="first-name"/>
             <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
          
             
@@ -369,7 +412,9 @@ const createNewBlog=async ()=>{
                             </div>               
                        </Modal>
             }
+            {/* <Example placeholder={"Start Typing"}/> */}
           </div>
+          
          </>
   )
 }

@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from 'axios'
 import {ID, Response} from '../../../../../_metronic/helpers'
 import {User, UsersQueryResponse} from './_models'
 
-const COURSE_URL = 'https://quiz.datacubeindia.com/api/common/course'
+const COURSE_URL =window.location.host==="localhost:3011"?"http://localhost:5000/api/common/course" :'https://quiz.quizophy.com/api/common/course'
 
 const getUsers = (query: string): Promise<UsersQueryResponse> => {
   return axios
@@ -14,18 +14,14 @@ const getAllCourses = (): Promise<any> => {
   return axios.get(`${COURSE_URL}`).then((d: AxiosResponse<any>) => d.data)
 }
 
-const getUserById = (id: ID): Promise<User | undefined> => {
-  return axios
-    .get(`${COURSE_URL}/${id}`)
-    .then((response: AxiosResponse<Response<User>>) => response.data)
-    .then((response: Response<User>) => response.data)
+const getUserById = (id: any): Promise<any> => {
+  return  axios.get(`${COURSE_URL}/${id}`)
+
 }
 
-const createUser = (user: User): Promise<User | undefined> => {
-  return axios
-    .post(COURSE_URL, user)
-    .then((response: AxiosResponse<Response<User>>) => response.data)
-    .then((response: Response<User>) => response.data)
+const createUser = (user: any): Promise<any | undefined> => {
+  return axios.post(COURSE_URL, user)
+    
 }
 
 const updateStatus = (status: any, id: ID): Promise<User | undefined> => {

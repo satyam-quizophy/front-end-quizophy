@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import {  APIURLQUIZ } from '../../APIURL';
 import { createNewPlan } from '../../userList/interface';
 import ToastComp from '../../userList/ToastComp';
+import { useSelector } from 'react-redux';
 
 const CreateNewPlan = () => {
     const [selectCategory, setSelectCategory] = useState<string>("");
@@ -67,6 +68,14 @@ const CreateNewPlan = () => {
     ];
 
 
+    const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+    const filterStaffPermission=async (title:string)=>{
+      let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+      if(!result[0]?.can_create) navigate("/conference-quiz/podium/plan-list")
+    }
+    useEffect(()=>{
+      filterStaffPermission(navItem?.item)
+      },[navItem])
     
     const getPlanCategoryId=(name:any)=>{
       let planListArray:any[]=planCategoryData.filter((item:any)=>item?.name===name)

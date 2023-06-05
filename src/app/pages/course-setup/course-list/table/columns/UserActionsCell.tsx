@@ -1,36 +1,54 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {FC, useEffect, useRef} from 'react'
+import {FC, useEffect, useRef,useState} from 'react'
 import {useMutation, useQueryClient} from 'react-query'
 import {Link} from 'react-router-dom'
 import {MenuComponent} from '../../../../../../_metronic/assets/ts/components'
-import {ID, KTSVG, QUERIES} from '../../../../../../_metronic/helpers'
+import {ID, KTSVG, QUERIES, toAbsoluteUrl} from '../../../../../../_metronic/helpers'
 import {useListView} from '../../core/ListViewProvider'
 import {useQueryResponse} from '../../core/QueryResponseProvider'
-import {deleteUser} from '../../core/_requests'
-
+import {createUser, deleteUser, getUserById} from '../../core/_requests'
+import { useSelector } from 'react-redux'
+import 'react-responsive-modal/styles.css';
+import { Modal } from 'react-responsive-modal';
+import { errrorMessage, successMessage } from '../../../../../modules/auth/components/ToastComp'
+import { API_URL } from '../../../../settings/components/ApiUrl'
+import axios, { AxiosResponse } from 'axios'
 type Props = {
   id: ID
 }
 
 const UserActionsCell: FC<Props> = ({id}) => {
-  const {setItemIdForUpdate} = useListView()
   const {query} = useQueryResponse()
+  const {setItemIdForUpdate}=useListView()
   const queryClient = useQueryClient()
   const openDrawerRef: any = useRef(null)
-
+ 
   useEffect(() => {
     MenuComponent.reinitialization()
   }, [])
+  
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
+
+
 
   const openEditModal = () => {
     setItemIdForUpdate(id)
-    openDrawerRef.current.setAttribute('id', 'kt_drawer_course_toggle')
+    // openDrawerRef.current.setAttribute('id', 'kt_drawer_course_toggle')
   }
 
   const deleteItem = useMutation(() => deleteUser(id), {
     // 💡 response of the mutation is passed to onSuccess
     onSuccess: () => {
       // ✅ update detail view directly
+      successMessage("Course Deleted Successfully")
       queryClient.invalidateQueries([`${QUERIES.USERS_LIST}-${query}`])
     },
   })
@@ -50,23 +68,25 @@ const UserActionsCell: FC<Props> = ({id}) => {
         className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4'
         data-kt-menu='true'
       >
+         <div className='menu-item'>
+        </div>
         {/* begin::Menu item */}
         <div className='menu-item'>
-          <a className='menu-link px-3' onClick={openEditModal} ref={openDrawerRef}>
+        {permissionList?.can_edit &&  <a className='menu-link px-3' onClick={openEditModal} ref={openDrawerRef}>
             Edit
-          </a>
+          </a>}
         </div>
         {/* end::Menu item */}
 
         {/* begin::Menu item */}
         <div className='menu-item'>
-          <a
+        {permissionList?.can_delete &&  <a
             className='menu-link px-3'
             data-kt-users-table-filter='delete_row'
             onClick={async () => await deleteItem.mutateAsync()}
           >
             Delete
-          </a>
+          </a>}
         </div>
         {/* end::Menu item */}
       </div>

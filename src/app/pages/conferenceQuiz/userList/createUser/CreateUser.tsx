@@ -18,6 +18,7 @@ import { AiFillEye } from 'react-icons/ai';
 import { createNewUser } from '../interface';
 import { APIURLAUTH } from '../../APIURL';
 import ToastComp from '../ToastComp';
+import { useSelector } from 'react-redux';
 const CreateUser = () => {
   const [validNumber,setValidNumber]=useState<any>(false)
 
@@ -29,10 +30,19 @@ const CreateUser = () => {
     password:"",
   })
   const [show,setShow]=useState<boolean>(false)
+  
 
   const navigate=useNavigate()
  
-
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    if(!result[0]?.can_create)
+      navigate("/conference-quiz/user")
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
 
   const checkValidation=async()=>{
     if(newUser?.first_name.trim().length<3){

@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import validator from 'validator'
 import Select from 'react-select'
 import ToastComp from '../../userList/ToastComp';
+import { useSelector } from 'react-redux';
 
 const CreateUpdateTransaction = () => {
     const [editTransaction,setEditTransaction]=useState<any>()
@@ -35,6 +36,16 @@ const CreateUpdateTransaction = () => {
     const location=useLocation()
     const params=useParams()
     const navigate=useNavigate()
+    const [permissionlist,setPermissionList]=useState<any>()
+    const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+    const filterStaffPermission=async (title:string)=>{
+      let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+      setPermissionList(result[0])
+      if(!result[0]?.can_create && !result[0]?.can_edit && !result[0]?.can_delete) navigate("/conference-quiz/podium/transaction-history")
+    }
+    useEffect(()=>{
+      filterStaffPermission(navItem?.item)
+      },[navItem])
     const options2 = [
       { value: "Monthly", label: "Monthly" },
       { value: "Yearly", label: "Yearly" },
@@ -400,13 +411,13 @@ const CreateUpdateTransaction = () => {
                              <button className="btn btn-success w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
                                 e?.preventDefault()
                                 if(params?.id){
-                                  updateTransaction()
+                                 permissionlist?.can_edit &&  updateTransaction()
                                 }else{
-                                  createTransaction()
+                                 permissionlist?.can_create && createTransaction()
                                 }
                             }}>{params?.id ? "Update" : "Create"} Transaction</button>
                             {
-                              params?.id &&  <button className="btn btn-danger w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
+                              params?.id  && permissionlist?.can_delete &&  <button className="btn btn-danger w-25 mt-5 text-center mx-auto" onClick={(e:any)=>{
                                 e?.preventDefault()
                                 deleteTransaction()
                             }}>Delete Transaction</button>

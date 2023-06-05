@@ -2,115 +2,92 @@
 import axios, {AxiosResponse} from 'axios'
 import clsx from 'clsx'
 import React, {FC, useEffect, useState} from 'react'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import Swal from 'sweetalert2'
 import {KTSVG, toAbsoluteUrl} from '../../../../_metronic/helpers'
 import {Dropdown1, ChatInner} from '../../../../_metronic/partials'
 import {API_URL} from './ApiUrl'
 import {Button} from './Button'
 import {SettingsName} from './SettingsName'
-
+import validator from 'validator'
+import { errrorMessage, successMessage } from '../../../modules/auth/components/ToastComp'
+import { useSelector } from 'react-redux'
 const Email: FC = () => {
-  const [values, setValue] = useState<any>({
-    mail_engine: '',
-    protocol: '',
-    email: '',
-    charset: '',
-    bcc_all: '',
-    signature: '',
-    header: '',
-    footer: '',
-    test_email: '',
-  })
-  const [apikey, setApiKey] = useState<string>('')
-  const [errors, setErrors] = useState<any>({
-    mail_engine: '',
-    protocol: '',
-    email: '',
-    charset: '',
-    bcc_all: '',
-    signature: '',
-    apikey: '',
-  })
+  const [apiKey,setApiKey]=useState<any>()
+  const [data,setData]=useState<any>()
+  const [values, setValue] = useState<any>()
 
   const [tab, setTab] = useState('email_smtp')
-
+  const navigate=useNavigate()
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+    if(!result[0]?.can_view){
+       navigate("/dashboard")
+    }
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem.item)
+    },[])
   useEffect(() => {
     getInfo()
   }, [tab])
 
   const getInfo = async () => {
-    await axios
-      .get(`${API_URL}/${tab}`)
-      .then((data: AxiosResponse<any>) => {
-        if (data.data != null) {
-          const newvalues = JSON.parse(data.data.value)
-          tab == 'email_smtp' ? setValue(newvalues) : setApiKey(newvalues.apikey)
-        }
-      })
-      .catch((err) => {
-        console.log(err, 'err')
-      })
+const {data}=await axios.get(`${API_URL}/option/email_details`)
+console.log(data)
+   setData(data)
+      setValue(data?.value)
   }
 
   const onChange = (e: any) => {
-    const {name, value} = e.target
-    tab == 'email_smtp' ? setValue({...values, [name]: value}) : setApiKey(value)
-    setErrors({...errors, [name]: ''})
+     
   }
 
   const onSubmit = async (e: any) => {
     e.preventDefault()
-    if (values.mail_engine == '') {
-      setErrors({...errors, mail_engine: 'Mail engine is required'})
-      return
-    }
-    if (values.protocol == '') {
-      setErrors({...errors, protocol: 'Email protocol is required'})
-      return
-    }
-    if (values.email == '') {
-      setErrors({...errors, email: 'Email is required'})
-      return
-    }
-
-    if (values.charset == '') {
-      setErrors({...errors, charset: 'Email charset is required'})
-      return
-    }
-
-    if (values.bcc_all == '') {
-      setErrors({...errors, bcc_all: 'Bcc all emails to is required'})
-      return
-    }
-    if (values.signature == '') {
-      setErrors({...errors, signature: 'Email signature is required'})
-      return
-    }
-
-    if (apikey == '' && tab == 'email_sendinblue') {
-      setErrors({...errors, apikey: 'Api-key is required'})
-      return
-    }
-
-    const payload = {
-      name: tab,
-      value: JSON.stringify(tab == 'email_smtp' ? values : {apikey}),
-      auto_load: 0,
-    }
-    await axios
-      .post(API_URL, payload)
-      .then((data: AxiosResponse<any>) => {
-        Swal.fire({
-          title: 'Success!',
-          text: `Settings Updated!`,
-          icon: 'success',
-          confirmButtonText: 'Okay',
-        })
-      })
-      .catch((err) => {
-        console.log(err, 'err')
-      })
+      if(!validator.isEmail(values.Email)){
+        errrorMessage("Email is not valid")
+      }
+      else if(!values?.SMTP_Username){
+         errrorMessage("SMTP Username is required")
+      }
+      else if(!values?.SMTP_Password){
+        errrorMessage("SMTP Password is required")
+     }
+     else if(!values?.Email_Charset){
+      errrorMessage("Email charset is required")
+   }
+   else if(!values?.BCC_All_Emails_To){
+    errrorMessage("BCC All Emails To is required")
+ }
+ else if(!values?.Email_Signature){
+  errrorMessage("Email Signature is required")
+}
+else if(!values?.Email_Encryption){
+  errrorMessage("Email Encryption is required")
+}
+else if(!values?.SMTP_Username){
+  errrorMessage("SMTP Username is required")
+}
+else if(!values?.SMTP_Host){
+  errrorMessage("SMTP Host is required")
+}
+else if(!values?.SMTP_Port){
+  errrorMessage("SMTP Port is required")
+}
+else{
+  // setData({...data,value:values})
+ const data2= await axios.put(`${API_URL}/option`, {name:data?.name,value:values})
+ console.log(data2?.data)
+   if(data2?.data?.success){
+    getInfo()
+    successMessage("Email details Updated Successfully")
+   }
+}
+      
   }
 
   return (
@@ -130,7 +107,7 @@ const Email: FC = () => {
                 SMTP
               </a>
             </li>
-            <li className='nav-item mt-2'>
+            {/* <li className='nav-item mt-2'>
               <a
                 style={{cursor: 'pointer'}}
                 className={`nav-link text-active-primary ms-0 me-10 py-5 ${
@@ -140,7 +117,7 @@ const Email: FC = () => {
               >
                 Send In Blue
               </a>
-            </li>
+            </li> */}
           </ul>
           <div className='separator separator-dashed my-5 '></div>
           <form noValidate className='form' onSubmit={onSubmit}>
@@ -153,8 +130,8 @@ const Email: FC = () => {
                 </>
               ) : (
                 <>
-                  <h4>Send In Blue Settings</h4>
-                  <span className='text-muted'>Setup Send in blue email</span>
+                  {/* <h4>Send In Blue Settings</h4>
+                  <span className='text-muted'>Setup Send in blue email</span> */}
                 </>
               )}
             </div>
@@ -163,7 +140,7 @@ const Email: FC = () => {
             {tab == 'email_smtp' ? (
               <>
                 <div className='d-flex flex-wrap gap-5 mb-10'>
-                  <div className='fv-row w-100 flex-md-root'>
+                  {/* <div className='fv-row w-100 flex-md-root'>
                     <label className='required fw-bold fs-6 mb-2'>Mail Engine</label>
                     <div className='form-check form-check-custom form-check-solid gap-3'>
                       <input
@@ -200,24 +177,23 @@ const Email: FC = () => {
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                   <div className='fv-row w-100 flex-md-root'>
                     <label className='required fw-bold fs-6 mb-2'>Email Protocol</label>
                     <div className='form-check form-check-custom form-check-solid gap-3'>
                       <input
-                        name='protocol'
                         type={'radio'}
-                        value='0'
-                        onChange={onChange}
-                        checked={values.protocol == '0'}
+                        name="SMTP"
+                        checked={values?.SMTP?true:false}
                         id='SMTP'
+                        onChange={()=>{}}
                         className={clsx('form-check-input mb-3 mb-lg-0')}
                         autoComplete='off'
                       />
                       <label className='form-check-label' htmlFor='SMTP'>
                         <div className='fw-bolder text-gray-800'>SMTP</div>
                       </label>
-                      <input
+                      {/* <input
                         name='protocol'
                         type={'radio'}
                         value='1'
@@ -226,8 +202,8 @@ const Email: FC = () => {
                         id='Sendmail'
                         className={clsx('form-check-input mb-3 mb-lg-0')}
                         autoComplete='off'
-                      />
-                      <label className='form-check-label' htmlFor='Sendmail'>
+                      /> */}
+                      {/* <label className='form-check-label' htmlFor='Sendmail'>
                         <div className='fw-bolder text-gray-800'>Sendmail</div>
                       </label>
                       <input
@@ -239,62 +215,156 @@ const Email: FC = () => {
                         id='Mail'
                         className={clsx('form-check-input mb-3 mb-lg-0')}
                         autoComplete='off'
-                      />
-                      <label className='form-check-label' htmlFor='Mail'>
+                      /> */}
+                      {/* <label className='form-check-label' htmlFor='Mail'>
                         <div className='fw-bolder text-gray-800'>Mail</div>
-                      </label>
-                    </div>
-                    <div className='fv-plugins-message-container pt-2'>
-                      <div className='fv-help-block'>
-                        <span role='alert' className='text-danger'>
-                          {errors.protocol}
-                        </span>
-                      </div>
+                      </label> */}
                     </div>
                   </div>
                 </div>
 
-                <div className='d-flex flex-wrap gap-5 mb-10'>
-                  <div className='fv-row w-100 flex-md-root'>
-                    <label className='required fw-bold fs-6 mb-2'>Email</label>
+                <div className='row gy-5 mb-10'>
+
+                       <div className='col-md-6'>
+                         <label className='required fw-bold fs-6 mb-2'>Email</label>
+                         <input
+                           placeholder={`Enter Email`}
+                           type={'email'}
+                           name={`Email`}
+                           onChange={(e:any)=>{
+                              setValue({...values,[e?.target?.name]:e?.target?.value})
+                           }}
+                           value={values?.Email|| ""}
+                           className={clsx('form-control mb-3 mb-lg-0')}
+                           autoComplete='off'
+                         />
+                       </div>
+                  <div className=' col-md-6'>
+                    <label className='required fw-bold fs-6 mb-2'>SMTP Username</label>
                     <input
-                      placeholder='Enter a email'
-                      name='email'
-                      type={'email'}
-                      onChange={onChange}
-                      value={values.email}
-                      className={clsx('form-control mb-3 mb-lg-0', {'is-invalid': errors.email})}
+                      placeholder='Enter SMTP Username'
+                      type="text"
+                      name={`SMTP_Username`}
+                      onChange={(e:any)=>{
+                         setValue({...values,[e?.target?.name]:e?.target?.value})
+                      }}
+                      value={values?.SMTP_Username|| ""}
+                      className={clsx('form-control mb-3 mb-lg-0')}
                       autoComplete='off'
                     />
-                    <div className='fv-plugins-message-container'>
-                      <div className='fv-help-block'>
-                        <span role='alert' className='text-danger'>
-                          {errors.email}
-                        </span>
-                      </div>
-                    </div>
+                   
                   </div>
-                  <div className='fv-row w-100 flex-md-root'>
+                  <div className=' col-md-6'>
+                    <label className='required fw-bold fs-6 mb-2'>SMTP Password</label>
+                    <input
+                      placeholder='Enter SMTP Password'
+                      type={'text'}
+                      name={`SMTP_Password`}
+                      onChange={(e:any)=>{
+                         setValue({...values,[e?.target?.name]:e?.target?.value})
+                      }}
+                      value={values?.SMTP_Password|| ""}
+                      className={clsx('form-control mb-3 mb-lg-0')}
+                      autoComplete='off'
+                    />
+                  </div>
+                  <div className=' col-md-6'>
                     <label className='required fw-bold fs-6 mb-2'>Email Charset</label>
                     <input
                       placeholder='Enter a charset'
-                      name='charset'
-                      onChange={onChange}
-                      value={values.charset}
-                      className={clsx('form-control mb-3 mb-lg-0', {'is-invalid': errors.charset})}
+                      type="text"
+                      name={`Email_Charset`}
+                      onChange={(e:any)=>{
+                         setValue({...values,[e?.target?.name]:e?.target?.value})
+                      }}
+                      value={values?.Email_Charset|| ""}
+                      
+                      className={clsx('form-control mb-3 mb-lg-0')}
                       autoComplete='off'
                     />
-                    <div className='fv-plugins-message-container'>
-                      <div className='fv-help-block'>
-                        <span role='alert' className='text-danger'>
-                          {errors.charset}
-                        </span>
-                      </div>
-                    </div>
+                   
+                  </div>
+                  <div className=' col-md-6'>
+                    <label className='required fw-bold fs-6 mb-2'>BCC All Emails To</label>
+                    <input
+                      placeholder='Enter BCC All Emails To'
+                      type="text"
+                      name={`BCC_All_Emails_To`}
+                      onChange={(e:any)=>{
+                         setValue({...values,[e?.target?.name]:e?.target?.value})
+                      }}
+                      value={values?.BCC_All_Emails_To|| ""}
+                      
+                      className={clsx('form-control mb-3 mb-lg-0')}
+                      autoComplete='off'
+                    />
+                  </div>
+                  <div className=' col-md-6'>
+                    <label className='required fw-bold fs-6 mb-2'>Email Signature</label>
+                    <input
+                      placeholder='Enter Email Signature'
+                      type="text"
+                      name={`Email_Signature`}
+                      onChange={(e:any)=>{
+                         setValue({...values,[e?.target?.name]:e?.target?.value})
+                      }}
+                      value={values?.Email_Signature|| ""}
+                      
+                      className={clsx('form-control mb-3 mb-lg-0')}
+                      autoComplete='off'
+                    />
+                    
+                  </div>
+                  <div className=' col-md-6'>
+                    <label className='required fw-bold fs-6 mb-2'>Email Encryption</label>
+                    <input
+                      placeholder='Enter Email Encryption'
+                      type="text"
+                      name={`Email_Encryption`}
+                      onChange={(e:any)=>{
+                         setValue({...values,[e?.target?.name]:e?.target?.value})
+                      }}
+                      value={values?.Email_Encryption|| ""}
+                      
+                      className={clsx('form-control mb-3 mb-lg-0')}
+                      autoComplete='off'
+                    />
+                  </div>
+                  <div className=' col-md-6'>
+                    <label className='required fw-bold fs-6 mb-2'>SMTP Host</label>
+                    <input
+                      placeholder='Enter Email SMTP Host'
+                      type="text"
+                      name={`SMTP_Host`}
+                      onChange={(e:any)=>{
+                         setValue({...values,[e?.target?.name]:e?.target?.value})
+                      }}
+                      value={values?.SMTP_Host|| ""}
+                      
+                      className={clsx('form-control mb-3 mb-lg-0')}
+                      autoComplete='off'
+                    />
+                   
+                  </div>
+                  <div className=' col-md-6'>
+                    <label className='required fw-bold fs-6 mb-2'>SMTP Port</label>
+                    <input
+                      placeholder='Enter Email SMTP Port'
+                      type="number"
+                      name={`SMTP_Port`}
+                      onChange={(e:any)=>{
+                         setValue({...values,[e?.target?.name]:e?.target?.value})
+                      }}
+                      value={values?.SMTP_Port|| ""}
+                      
+                      className={clsx('form-control mb-3 mb-lg-0')}
+                      autoComplete='off'
+                    />
+                   
                   </div>
                 </div>
 
-                <div className='d-flex flex-wrap gap-5 mb-10'>
+                {/* <div className='d-flex flex-wrap gap-5 mb-10'>
                   <div className='fv-row w-100 flex-md-root'>
                     <label className='required fw-bold fs-6 mb-2'>BCC All Emails To</label>
                     <input
@@ -360,7 +430,7 @@ const Email: FC = () => {
                       autoComplete='off'
                     />
                   </div>
-                </div>
+                </div> */}
                 <div className='fv-row w-100 flex-md-root'>
                   <label className='fw-bold fs-6 mb-2'>Send Test Email</label>
                   <div className='text-muted mb-3'>
@@ -371,7 +441,6 @@ const Email: FC = () => {
                       placeholder='Enter test email'
                       name='test_email'
                       onChange={onChange}
-                      value={values.test_email}
                       className={clsx('form-control mb-3 mb-lg-0')}
                       autoComplete='off'
                     />
@@ -383,7 +452,7 @@ const Email: FC = () => {
               </>
             ) : (
               <div className='fv-row w-100 mb-10'>
-                <label className='required fw-bold fs-6 mb-2'>Api key</label>
+                {/* <label className='required fw-bold fs-6 mb-2'>Api key</label>
                 <input
                   placeholder='Enter a email api-key'
                   name='apikey'
@@ -391,17 +460,10 @@ const Email: FC = () => {
                   value={apikey}
                   className={clsx('form-control mb-3 mb-lg-0', {'is-invalid': errors.apikey})}
                   autoComplete='off'
-                />
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                      {errors.apikey}
-                    </span>
-                  </div>
-                </div>
+                /> */}
               </div>
             )}
-            <Button />
+           {permissionList?.can_edit && <Button />}
           </form>
         </div>
       </div>

@@ -8,7 +8,6 @@ const PathMiddleWare = ({children}:any) => {
     useEffect(()=>{
          const pathName=window.location.pathname
          if(asideMenuUrl && pathName?.split("/")[1]==="settings"){
-            console.log(pathName?.split("/")[2])
             if(!asideMenuUrl.includes(pathName?.split("/")[2])){
                 navigate("/dashboard")
             }

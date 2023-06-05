@@ -22,7 +22,7 @@ const UserInfoCell: FC<Props> = ({user}) => {
     <div className='d-flex align-items-center'>
       {/* begin:: Avatar */}
       <div className='symbol symbol-circle symbol-50px overflow-hidden me-3'>
-        <a onClick={openEditModal} style={{cursor: 'pointer'}}>
+        <a  style={{cursor: 'pointer'}}>
           {user?.profile_image ? (
             <div className='symbol-label'>
               <img src={user?.profile_image} alt={user?.first_name} className='w-100' />
@@ -36,7 +36,6 @@ const UserInfoCell: FC<Props> = ({user}) => {
       </div>
       <div className='d-flex flex-column'>
         <a
-          onClick={openEditModal}
           style={{cursor: 'pointer'}}
           className='text-gray-800 text-hover-primary mb-1'
         >

@@ -13,6 +13,7 @@ import Dialog from '@mui/material/Dialog';
 import { AiFillDelete } from 'react-icons/ai';
 import Dropzone from 'react-dropzone'
 import ToastComp from '../../userList/ToastComp'
+import { useSelector } from 'react-redux'
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -59,8 +60,16 @@ const EditTemplate: FC = () => {
   }
   const [questions, setQuestions] = useState<Array<any>>([])
   const [selected, setSelected] = useState<any>(0)
-
-  
+  const [permissionlist,setPermissionList]=useState<any>()
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+    if(!result[0]?.can_edit && !result[0]?.can_delete) navigate("/conference-quiz/podium/template")
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
 const findTemplateById=async ()=>{
     const {data}=await axios.get(`${APIURLTEMPLATE}/admin/findTemplate/${params?.id}`)
     if(data?.success){
@@ -450,14 +459,14 @@ const findTemplateById=async ()=>{
                 </select>
                 
                 <div className="d-flex flex-column">
-                <button className="btn btn-success mt-5" onClick={(e:any)=>{
+               {permissionlist?.can_edit && <button className="btn btn-success mt-5" onClick={(e:any)=>{
                   e.preventDefault()
                   validateTemplate()
-                }}>Update Template</button>
-                   <button className="btn btn-danger mt-5" onClick={(e:any)=>{
+                }}>Update Template</button>}
+                {permissionlist?.can_delete &&  <button className="btn btn-danger mt-5" onClick={(e:any)=>{
                   e.preventDefault()
                   deleteTemplate()
-                }}>Delete Template</button>
+                }}>Delete Template</button>}
                 </div>
                
               </div>

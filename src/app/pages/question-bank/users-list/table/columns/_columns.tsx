@@ -10,6 +10,7 @@ import {User} from '../../core/_models'
 import {CoursesCell} from './Courses'
 import {SubjectCell} from './SubjectCell'
 import {Verified} from './VerifiedCell'
+import { VerifiedBy } from './verifiedBy'
 
 const usersColumns: ReadonlyArray<Column<User>> = [
   {
@@ -18,7 +19,7 @@ const usersColumns: ReadonlyArray<Column<User>> = [
     Cell: ({...props}) => <UserSelectionCell id={props.data[props.row.index].id} />,
   },
   {
-    Header: (props) => <UserCustomHeader tableProps={props} title='Q.ID' className='min-w-125px' />,
+    Header: (props) => <UserCustomHeader tableProps={props} title='Q.Bank.ID' className='min-w-125px' />,
     accessor: 'id',
   },
   {
@@ -67,6 +68,13 @@ const usersColumns: ReadonlyArray<Column<User>> = [
     ),
     id: 'verified',
     Cell: ({...props}) => <Verified questions={props.data[props.row.index].questions} />,
+  },
+  {
+    Header: (props) => (
+      <UserCustomHeader tableProps={props} title='Verified By' className='min-w-125px' />
+    ),
+    id: 'verified_by',
+    Cell: ({...props}) => <VerifiedBy questions={props.data[props.row.index].questions} />,
   },
   {
     Header: (props) => (

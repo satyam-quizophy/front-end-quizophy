@@ -21,7 +21,6 @@ const UserInfoCell: FC<Props> = ({user}) => {
     <div className='d-flex align-items-center'>
       <div className='d-flex flex-column'>
         <a
-          onClick={openEditModal}
           style={{cursor: 'pointer'}}
           className='text-gray-800 text-hover-primary mb-1'
         >

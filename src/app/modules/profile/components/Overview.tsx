@@ -112,7 +112,7 @@ export const Overview: FC = () => {
     else if (staff?.password?.trim()?.length<8){
       errrorMessage("Password can't be less than 8 characters")
     }else{
-      const {data} = await updateUser(staff)
+      const {data} = await axios.put(`${API_URL}/staff/updateProfile/${currentUser?.id}`,staff)
       if(data?.success){
         saveAuth({...data?.data,token:currentUser?.token})
         setCurrentUser({...data?.data,token:currentUser?.token})

@@ -39,7 +39,6 @@ const createUser = (role: Role ): Promise<Role | undefined> => {
 }
 
 const updateUser = (role: Role): Promise<Role | undefined> => {
-  console.log(role, "role")
   return axios
     .put(`${ROLE_URL}/${role.id}`, role)
     .then((response: AxiosResponse<Response<Role>>) => response.data)

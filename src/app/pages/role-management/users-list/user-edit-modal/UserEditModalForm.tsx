@@ -59,22 +59,33 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
       setSubmitting(true)
       try {
         if (isNotEmpty(values.id)) {
-          await updateUser(values)
+          const data=await updateUser(values)
+          if(data){
+            setSubmitting(true)
+            cancel(true)
+            Swal.fire({
+              title: 'Success!',
+              text: `Role ${values.id ? 'Updated' : 'Created'}!`,
+              icon: 'success',
+              confirmButtonText: 'Okay',
+            })
+          }
         } else {
-          await createUser(values)
+          const data=await createUser(values)
+          if(data){
+            setSubmitting(true)
+            cancel(true)
+            Swal.fire({
+              title: 'Success!',
+              text: `Role ${values.id ? 'Updated' : 'Created'}!`,
+              icon: 'success',
+              confirmButtonText: 'Okay',
+            })
+          }
         }
       } catch (ex) {
         console.error(ex)
-      } finally {
-        setSubmitting(true)
-        cancel(true)
-        Swal.fire({
-          title: 'Success!',
-          text: `Role ${values.id ? 'Updated' : 'Created'}!`,
-          icon: 'success',
-          confirmButtonText: 'Okay',
-        })
-      }
+      } 
     },
   })
 

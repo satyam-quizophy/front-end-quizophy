@@ -30,14 +30,13 @@ const UserInfoCell: FC<Props> = ({user}) => {
             </div>
           ) : (
             <div className={clsx('symbol-label fs-3', `bg-light-warning`, `text-warning`)}>
-              {item.firstname?.charAt(0)}
+              {item?.firstname?.charAt(0)}
             </div>
           )}
         </a>
       </div>
       <div className='d-flex flex-column'>
         <a
-          onClick={openEditModal}
           style={{cursor: 'pointer'}}
           className='text-gray-800 text-hover-primary mb-1'
         >

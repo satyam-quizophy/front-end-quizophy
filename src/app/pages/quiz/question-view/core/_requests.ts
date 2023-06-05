@@ -2,13 +2,13 @@ import axios, {AxiosResponse} from 'axios'
 import {ID, Response} from '../../../../../_metronic/helpers'
 import {User, UsersQueryResponse} from './_models'
 
-const API_URL = 'https://quiz.datacubeindia.com/api/question'
+const API_URL = window.location.host==="localhost:3011"?"http://localhost:5002/api/question":'https://quiz.quizophy.com/api/question'
 const QUESTION_URL = `${API_URL}/question`
-const QUIZ_URL = 'https://quiz.datacubeindia.com/api/quiz/quiz'
+const QUIZ_URL = window.location.host==="localhost:3011"?"http://localhost:5003/api/quiz/quiz":'https://quiz.quizophy.com/api/quiz/quiz'
 
-const getUsers = (query: string): Promise<UsersQueryResponse> => {
+const getUsers = (id:any,query: string): Promise<UsersQueryResponse> => {
   return axios
-    .get(`${QUESTION_URL}?${query}`)
+    .get(`${QUESTION_URL}/getAllQuestionUsingQuizId/${id}?${query}`)
     .then((d: AxiosResponse<UsersQueryResponse>) => d.data)
 }
 

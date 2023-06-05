@@ -8,13 +8,18 @@ type Props = {
 }
 
 const CustomRow: FC<Props> = ({row}) => (
+  
   <tr {...row.getRowProps()}>
     {row.cells.map((cell) => {
       return (
+        
         <td
           {...cell.getCellProps()}
           className={clsx({'text-end min-w-100px': cell.column.id === 'actions'})}
         >
+          {
+            console.log(cell,"cell")
+          }
           {cell.render('Cell')}
         </td>
       )

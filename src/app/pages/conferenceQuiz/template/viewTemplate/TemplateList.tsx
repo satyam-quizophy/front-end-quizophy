@@ -13,6 +13,7 @@ import { APIURLTEMPLATE } from '../../APIURL';
 import Switch from '@mui/material/Switch';
 import { AiFillEdit } from 'react-icons/ai';
 import ToastComp from '../../userList/ToastComp';
+import { useSelector } from 'react-redux';
 
 
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
@@ -40,7 +41,18 @@ const TemplateList = () => {
         findAllTemplate()
       }
     }
+
+    const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+    const [permissionList,setPermissionList]=useState<any>({})
+    const filterStaffPermission=async (title:string)=>{
+      let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+      setPermissionList(result[0])
+    }
+    useEffect(()=>{
+      filterStaffPermission(navItem?.item)
+      },[navItem])
   
+    
     const columns = [
       {
         id: 1,
@@ -60,7 +72,7 @@ const TemplateList = () => {
             id: 3,
             name: "Status",
             selector: (row:any) =>  <Switch {...label} checked={row.status===1 ? true : false} onChange={(e:any)=>{
-               updateStatus(row?.id,row?.status)
+             permissionList?.can_edit &&  updateStatus(row?.id,row?.status)
             }}/>,
             sortable: true,
             reorder: true
@@ -76,7 +88,7 @@ const TemplateList = () => {
         id: 5,
         name: "Actions",
         selector: (row:any) => <AiFillEdit style={{color:"#777ea0",fontSize:"25px"}} onClick={()=>{
-            navigate(`/conference-quiz/podium/edit-template/${row?.id}`)
+          (permissionList?.can_edit || permissionList?.can_delete) &&  navigate(`/conference-quiz/podium/edit-template/${row?.id}`)
         }}/>,
         sortable: true,
         reorder: true
@@ -91,13 +103,13 @@ const TemplateList = () => {
       <div className="container">
           <div className="row">
              <div className="col-12 text-center d-flex" style={{justifyContent:"flex-end"}}>
-               <button className="btn btn-primary" onClick={()=>{
+             {permissionList?.can_create &&  <button className="btn btn-primary" onClick={()=>{
                      navigate("/conference-quiz/podium/create-new-template")
-               }}>Create New Template</button>
+               }}>Create New Template</button>}
              </div>
              <div className="col-12 mt-5">
               {
-                template?.length>0 ? <DataTable
+               permissionList?.can_view && template?.length>0 ? <DataTable
                 title=""
                 columns={columns}
                 data={template}

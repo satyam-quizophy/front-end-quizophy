@@ -13,6 +13,7 @@ import Dialog from '@mui/material/Dialog';
 
 import { AiFillDelete } from 'react-icons/ai';
 import ToastComp from '../../userList/ToastComp'
+import { useSelector } from 'react-redux'
 
 
 export interface DialogTitleProps {
@@ -63,6 +64,15 @@ const CreateTemplate: FC = () => {
     image: '',
   }])
   const [selected, setSelected] = useState<any>(0)
+
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    if(!result[0]?.can_create) navigate("/conference-quiz/podium/template")
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
 
   const uploadImage = async (file: any) => {
     const fd = new FormData()

@@ -1,14 +1,22 @@
 /* eslint-disable react/jsx-no-target-blank */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {useIntl} from 'react-intl'
 import {KTSVG} from '../../../helpers'
 import {AsideMenuItemWithSub} from './AsideMenuItemWithSub'
 import {AsideMenuItem} from './AsideMenuItem'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 export function AsideMenuMain () {
   const intl = useIntl()
   const {asideMenu}=useSelector((state:any)=>state.reducerData)
+  const [navItem,setNavItem]=useState<string>()
+ const dispatch=useDispatch()
+  // const storeNavValueInRedux=()=>{
+  //    dispatch({type:"navItem",payload:navItem})
+  // }
+  useEffect(()=>{
+    dispatch({type:"setNavItemValue",payload:navItem})
+  },[setNavItem,navItem])
   return (
     <>
     <AsideMenuItem
@@ -21,20 +29,23 @@ export function AsideMenuMain () {
         asideMenu && asideMenu?.map((item:any,index:number)=>{
           return  typeof item?.name==="string" ? <AsideMenuItem
                   key={index}
-                to={`/${item.url}`}
+                to={`${item.url}`}
                 icon={item?.icon}
                 title={`${item?.name}`}
                 fontIcon='bi-layers'
+                setNavItem={setNavItem}
               /> : item?.name?.label==="Settings" ? <AsideMenuItem
               to={`${item?.name?.url}`}
+              key={index}
               icon={`${item?.name?.icon}`}
               title={`${item?.name?.label}`}
               fontIcon='bi-layers'
+              setNavItem={setNavItem}
             />
-               : <AsideMenuItemWithSub key={index+1} to={item?.url} title={`${item?.name?.label}`}  icon={item?.name?.icon} fontIcon='bi-layers'>
+               : <AsideMenuItemWithSub key={index} to={item?.url} title={`${item?.name?.label}`}  icon={item?.name?.icon} fontIcon='bi-layers'>
                      {
                       item?.name?.value?.map((item2:any,index2:number)=>{
-                         return  <AsideMenuItem key={index2} to={`${item2?.url}`} title={item2?.name} hasBullet={true} />
+                         return  <AsideMenuItem key={index2} to={`${item2?.url}`} title={item2?.name} hasBullet={true} setNavItem={setNavItem}/>
                       })
                      }
               </AsideMenuItemWithSub>

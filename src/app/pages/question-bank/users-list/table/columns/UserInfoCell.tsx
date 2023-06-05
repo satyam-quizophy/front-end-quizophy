@@ -44,7 +44,6 @@ const UserInfoCell: FC<Props> = ({user}) => {
           user?.questions?.map((item: any, i: any) => (
             <a
               key={i}
-              onClick={openEditModal}
               style={{cursor: 'pointer'}}
               className='text-gray-800 text-hover-primary mb-1'
             >

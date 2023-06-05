@@ -17,7 +17,7 @@ const createAccountSchemas = [
     course_category: Yup.string().required('Course Category is required'),
     slug: Yup.string().required('Slug is required'),
     position: Yup.number().required('Category position is required'),
-    course_id: Yup.number().required('Course is required'),
+    // course_id: Yup.number().required('Course is required'),
   }),
 ]
 

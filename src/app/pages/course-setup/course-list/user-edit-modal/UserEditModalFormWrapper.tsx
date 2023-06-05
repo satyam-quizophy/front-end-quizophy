@@ -4,7 +4,7 @@ import {isNotEmpty, QUERIES} from '../../../../../_metronic/helpers'
 import {useListView} from '../core/ListViewProvider'
 import {getUserById} from '../core/_requests'
 
-const UserEditModalFormWrapper = () => {
+const UserEditModalFormWrapper = ({data}:any) => {
   const {itemIdForUpdate, setItemIdForUpdate} = useListView()
   const enabledQuery: boolean = isNotEmpty(itemIdForUpdate)
   const {isLoading, data: user, error} = useQuery(

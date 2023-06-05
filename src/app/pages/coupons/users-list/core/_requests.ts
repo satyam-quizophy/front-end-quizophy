@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from 'axios'
 import {ID, Response} from '../../../../../_metronic/helpers'
 import {User, UsersQueryResponse} from './_models'
 
-const API_URL = 'https://quiz.datacubeindia.com/api/common'
+const API_URL =window.location.host==="localhost:30110"?"http://localhost:5000/api/common": 'https://quiz.quizophy.com/api/common'
 const USER_URL = `${API_URL}/coupon`
 
 const getUsers = (query: string): Promise<UsersQueryResponse> => {

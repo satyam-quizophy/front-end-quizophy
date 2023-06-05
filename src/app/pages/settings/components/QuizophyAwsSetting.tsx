@@ -6,42 +6,71 @@ import { API_URL } from '../../staff-management/users-list/core/_requests'
 import {Button} from './Button'
 import {SettingsName} from './SettingsName'
 import { errrorMessage, successMessage } from '../../../modules/auth/components/ToastComp'
-let typeArr=["quizophy_aws_s3_bucket_name","quizophy_aws_s3_access_key","quizophy_aws_s3_access_secret_key","template_email","template_email_smtp_password","open_AI_API_key","pusher_key","pusher_API_ID","pusher_cluster_name","pusher_API_secret_key"]
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 const QuizophyAwsSetting: FC = () => {
-  const [values, setValue] = useState<Array<any>>()
+  const [values, setValue] = useState<any>()
+  const [name,setName]=useState<any>()
   useEffect(() => {
     getInfo()
   }, [])
 
-  const getInfo = async () => {
-    const {data}=await axios.get(`${API_URL}/option`)
-    if(data?.success){
-      console.log(data?.data)
-       setValue(data?.data)
-    }else{
-      errrorMessage(data?.message)
+  const navigate=useNavigate()
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+    if(!result[0]?.can_view){
+       navigate("/dashboard")
     }
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem.item)
+    },[])
+
+  const getInfo = async () => {
+    const {data}=await axios.get(`${API_URL}/option/quizophy_AWS_settings`)
+    setName(data?.name)
+       setValue(data?.value)
      
   }
 
   const onSubmit = async (e: any) => {
     e?.preventDefault()
-      let dataTrueOrFalse=values?.some((item:any)=>{
-        if(typeArr?.includes(item?.name)){
-             return !item?.value?.trim() || item?.value?.trim()===""
-        }
-    })
-    if(dataTrueOrFalse){
-      errrorMessage("All Fields Are Required")
-    }else{
-       const {data}=await axios.put(`${API_URL}/option`,values)
+    if(!values.quizophy_aws_s3_bucket_name){
+      errrorMessage("AWS Bucket Name is required")
+    }
+    else if(!values?.quizophy_aws_s3_access_key){
+       errrorMessage("AWS Access Key is required")
+    }
+    else if(!values?.quizophy_aws_s3_access_secret_key){
+      errrorMessage("AWS access secret key is required")
+   }
+   else if(!values?.open_AI_API_key){
+    errrorMessage("AI API Key  is required")
+ }
+ else if(!values?.pusher_key){
+  errrorMessage("Pusher key is required")
+}
+else if(!values?.pusher_cluster_name){
+errrorMessage("Pusher Cluster name is required")
+}
+else if(!values?.pusher_API_ID){
+errrorMessage("Pusher API ID is required")
+}
+else if(!values?.pusher_API_secret_key){
+errrorMessage("Pusher API Secret key is required")
+}else{
+  const {data}=await axios.put(`${API_URL}/option`,{name,value:values})
        if(data?.success){
         getInfo()
-        successMessage(data?.message)
+        successMessage("AWS Settings updated successfully")
        }else{
         errrorMessage(data?.message)
        }
-    }
+}
+    
   }
 
   return (
@@ -54,235 +83,131 @@ const QuizophyAwsSetting: FC = () => {
             documents where company info is required
           </span>
           <form className='form row' onSubmit={onSubmit} noValidate>
-            {
-              values?.map((item:any,index:number)=>{
-                  return  typeArr?.includes(item?.name) && <div key={index} className='col-6 mb-10'>
-                  <div className='fv-row w-100 flex-md-root'>
-                    <label className='required fw-bold fs-6 mb-2'>{item?.name}</label>
-                    <input
-                      placeholder='Enter Company Name'
-                      type='text'
-                      name='city'
-                      required
-                      onChange={(e:any)=>{
-                        let newArrValue:any[]=[...values]
-                        newArrValue[index].value=e?.target?.value
-                        setValue(newArrValue)
-                      }}
-                      value={item.value}
-                      className={clsx(
-                        'form-control mb-3 mb-lg-0',
-                      
-                      )}
-                      autoComplete='off'
-                    />
-                    <div className='fv-plugins-message-container'>
-                      <div className='fv-help-block'>
-                        <span role='alert' className='text-danger'>
-                      </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              })
-            }
-            {/* <div className='d-flex flex-wrap gap-5 mb-10'>
-            
-              <div className='fv-row w-100 flex-md-root'>
-                <label className='required fw-bold fs-6 mb-2'>Company Name</label>
-                <input
-                  placeholder='Enter a company name'
-                  type='text'
-                  name='name'
-                  required
-                  // onChange={onChange}
-                  // value={}
-                  className={clsx(
-                    'form-control mb-3 mb-lg-0',
-                  )}
-                  autoComplete='off'
-                />
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className='fv-row w-100 flex-md-root'>
-                <label className='required fw-bold fs-6 mb-2'>Address</label>
-                <input
-                  placeholder='Enter address'
-                  type='text'
-                  name='address'
-                  required
-                  // onChange={onChange}
-                  // value={values.company_address}
-                  className={clsx(
-                    'form-control mb-3 mb-lg-0',
-                    
-                  )}
-                  autoComplete='off'
-                  // disabled={formik.isSubmitting || isUserLoading}
-                />
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className='d-flex flex-wrap gap-5 mb-10'>
-              <div className='fv-row w-100 flex-md-root'>
-                <label className='required fw-bold fs-6 mb-2'>City</label>
-                <input
-                  placeholder='Enter city'
-                  type='text'
-                  name='city'
-                  required
-                  // onChange={onChange}
-                  // value={values.city}
-                  className={clsx(
-                    'form-control mb-3 mb-lg-0',
-                  
-                  )}
-                  autoComplete='off'
-                  // disabled={formik.isSubmitting || isUserLoading}
-                />
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                  </span>
-                  </div>
-                </div>
-              </div>
-              <div className='fv-row w-100 flex-md-root'>
-                <label className='required fw-bold fs-6 mb-2'>State</label>
-                <input
-                  placeholder='Enter state'
-                  // {...formik.getFieldProps('name')}
-                  type='text'
-                  name='state'
-                  required
-                  // onChange={onChange}
-                  // value={values.state}
-                  className={clsx(
-                    'form-control mb-3 mb-lg-0',
-                    // {
-                    //   'is-valid': formik.touched.name && !formik.errors.name,
-                    // }
-                  )}
-                  autoComplete='off'
-                  // disabled={formik.isSubmitting || isUserLoading}
-                />
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className='d-flex flex-wrap gap-5 mb-10'>
-              <div className='fv-row w-100 flex-md-root'>
-                <label className='required fw-bold fs-6 mb-2'>Country Code</label>
-                <input
-                  placeholder='Enter country code'
-                  // {...formik.getFieldProps('name')}
-                  type='text'
-                  name='country_code'
-                  required
-                  // onChange={onChange}
-                  // value={values.country_code}
-                  className={clsx(
-                    'form-control mb-3 mb-lg-0',
-                   
-                  )}
-                  autoComplete='off'
-                  // disabled={formik.isSubmitting || isUserLoading}
-                />
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className='fv-row w-100 flex-md-root'>
-                <label className='required fw-bold fs-6 mb-2'>Zip Code</label>
-                <input
-                  placeholder='Enter zip code'
-                  // {...formik.getFieldProps('name')}
-                  type='text'
-                  name='zip_code'
-                  required
-                  // onChange={onChange}
-                  // value={values.zip_code}
-                  className={clsx(
-                    'form-control mb-3 mb-lg-0',
-                   
-                  )}
-                  autoComplete='off'
-                  // disabled={formik.isSubmitting || isUserLoading}
-                />
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className='d-flex flex-wrap gap-5 mb-10'>
-              <div className='fv-row w-100 flex-md-root'>
-                <label className='required fw-bold fs-6 mb-2'>Phone</label>
-                <input
-                  placeholder='Enter phone number'
-                  // {...formik.getFieldProps('name')}
-                  type='text'
-                  required
-                  name='phone'
-                  // onChange={onChange}
-                  // value={values.phone_number}
-                  className={clsx(
-                    'form-control mb-3 mb-lg-0',
-                   
-                  )}
-                  autoComplete='off'
-                  // disabled={formik.isSubmitting || isUserLoading}
-                />
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                    <span role='alert' className='text-danger'>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className='fv-row w-100 flex-md-root'>
-                <label className='fw-bold fs-6 mb-2'>GST Number</label>
-                <input
-                  placeholder='Enter gst number'
-                  // {...formik.getFieldProps('name')}
-                  type='text'
-                  name='gst'
-                  // onChange={onChange}
-                  // value={values.gst}
-                  className={clsx(
-                    'form-control mb-3 mb-lg-0'
-                    
-                  )}
-                  autoComplete='off'
-                  // disabled={formik.isSubmitting || isUserLoading}
-                />
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>
-                  </div>
-                </div>
-              </div>
-            </div> */}
-            {/* )} */}
-            <Button />
+                <div className='row gy-5 mb-10'>
+
+                        <div className='col-md-6'>
+                          <label className='required fw-bold fs-6 mb-2'>Quizophy AWS S3 Bucket Name</label>
+                          <input
+                            placeholder={`Enter Quizophy AWS S3 Bucket Name`}
+                            type={'text'}
+                            name={`quizophy_aws_s3_bucket_name`}
+                            onChange={(e:any)=>{
+                              setValue({...values,[e?.target?.name]:e?.target?.value})
+                            }}
+                            value={values?.quizophy_aws_s3_bucket_name|| ""}
+                            className={clsx('form-control mb-3 mb-lg-0')}
+                            autoComplete='off'
+                          />
+                        </div>
+                        <div className=' col-md-6'>
+                        <label className='required fw-bold fs-6 mb-2'>Quizophy AWS S3 Access Key</label>
+                        <input
+                        placeholder='Enter Quizophy AWS s3 Access Key'
+                        type="text"
+                        name={`quizophy_aws_s3_access_key`}
+                        onChange={(e:any)=>{
+                          setValue({...values,[e?.target?.name]:e?.target?.value})
+                        }}
+                        value={values?.quizophy_aws_s3_access_key|| ""}
+                        className={clsx('form-control mb-3 mb-lg-0')}
+                        autoComplete='off'
+                        />
+
+                        </div>
+                        <div className=' col-md-6'>
+                        <label className='required fw-bold fs-6 mb-2'>Quizophy AWS S3 Access Secret Key</label>
+                        <input
+                        placeholder='Enter Quizophy AWS s3 Access Secret Key'
+                        type={'text'}
+                        name={`quizophy_aws_s3_access_secret_key`}
+                        onChange={(e:any)=>{
+                          setValue({...values,[e?.target?.name]:e?.target?.value})
+                        }}
+                        value={values?.quizophy_aws_s3_access_secret_key|| ""}
+                        className={clsx('form-control mb-3 mb-lg-0')}
+                        autoComplete='off'
+                        />
+                        </div>
+                        <div className=' col-md-6'>
+                        <label className='required fw-bold fs-6 mb-2'>Open AI API Key</label>
+                        <input
+                        placeholder='Enter Open AI API Key'
+                        type="text"
+                        name={`open_AI_API_key`}
+                        onChange={(e:any)=>{
+                          setValue({...values,[e?.target?.name]:e?.target?.value})
+                        }}
+                        value={values?.open_AI_API_key|| ""}
+
+                        className={clsx('form-control mb-3 mb-lg-0')}
+                        autoComplete='off'
+                        />
+
+                        </div>
+                        <div className=' col-md-6'>
+                        <label className='required fw-bold fs-6 mb-2'>Pusher Key</label>
+                        <input
+                        placeholder='Enter Pusher Key'
+                        type="text"
+                        name={`pusher_key`}
+                        onChange={(e:any)=>{
+                          setValue({...values,[e?.target?.name]:e?.target?.value})
+                        }}
+                        value={values?.pusher_key|| ""}
+
+                        className={clsx('form-control mb-3 mb-lg-0')}
+                        autoComplete='off'
+                        />
+                        </div>
+                        <div className=' col-md-6'>
+                        <label className='required fw-bold fs-6 mb-2'>Pusher Cluster Name</label>
+                        <input
+                        placeholder='Enter Pusher Cluster Name'
+                        type="text"
+                        name={`pusher_cluster_name`}
+                        onChange={(e:any)=>{
+                          setValue({...values,[e?.target?.name]:e?.target?.value})
+                        }}
+                        value={values?.pusher_cluster_name|| ""}
+
+                        className={clsx('form-control mb-3 mb-lg-0')}
+                        autoComplete='off'
+                        />
+
+                        </div>
+                        <div className=' col-md-6'>
+                        <label className='required fw-bold fs-6 mb-2'>Pusher API ID</label>
+                        <input
+                        placeholder='Enter Pusher API ID'
+                        type="text"
+                        name={`pusher_API_ID`}
+                        onChange={(e:any)=>{
+                          setValue({...values,[e?.target?.name]:e?.target?.value})
+                        }}
+                        value={values?.pusher_API_ID|| ""}
+
+                        className={clsx('form-control mb-3 mb-lg-0')}
+                        autoComplete='off'
+                        />
+                        </div>
+                        <div className=' col-md-6'>
+                        <label className='required fw-bold fs-6 mb-2'>Pusher API Secret Key</label>
+                        <input
+                        placeholder='Enter Pusher API Secret Key'
+                        type="text"
+                        name={`pusher_API_secret_key`}
+                        onChange={(e:any)=>{
+                          setValue({...values,[e?.target?.name]:e?.target?.value})
+                        }}
+                        value={values?.pusher_API_secret_key|| ""}
+
+                        className={clsx('form-control mb-3 mb-lg-0')}
+                        autoComplete='off'
+                        />
+
+                        </div>
+                        </div>
+           {permissionList?.can_edit && <Button />}
           </form>
         </div>
       </div>

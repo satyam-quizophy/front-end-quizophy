@@ -14,10 +14,19 @@ import { FiMoreVertical } from 'react-icons/fi';
 import { APIURLQUIZ } from '../APIURL';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
+import { useSelector } from 'react-redux';
 const OneTimeSetting = () => {  
     const [oneTimePlan,setOneTimePlan]=useState<Array<any[]>>([])
     const navigate=useNavigate()
-    
+    const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+    const [permissionList,setPermissionList]=useState<any>({})
+    const filterStaffPermission=async (title:string)=>{
+      let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+      setPermissionList(result[0])
+    }
+    useEffect(()=>{
+      filterStaffPermission(navItem?.item)
+      },[navItem])
     
    
     const getAllOneTimeRequest=async ()=>{
@@ -87,7 +96,7 @@ const OneTimeSetting = () => {
           <div className="row">
              <div className="col-12 mt-5">
               {
-                oneTimePlan?.length>0 ? <DataTable
+               permissionList?.can_view && oneTimePlan?.length>0 ? <DataTable
                 title=""
                 columns={columns}
                 data={oneTimePlan}

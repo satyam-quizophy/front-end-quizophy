@@ -9,6 +9,8 @@ import {UserSelectionHeader} from './UserSelectionHeader'
 import {User} from '../../core/_models'
 import {CoursesCell} from './Courses'
 import {SubjectCell} from './SubjectCell'
+import { MarksCell } from './MarksCell'
+import { QuizTypeCell } from './UserQuizTypeCell'
 
 const usersColumns: ReadonlyArray<Column<User>> = [
   {
@@ -17,7 +19,7 @@ const usersColumns: ReadonlyArray<Column<User>> = [
     Cell: ({...props}) => <UserSelectionCell id={props.data[props.row.index].id} />,
   },
   {
-    Header: (props) => <UserCustomHeader tableProps={props} title='ID' className='min-w-125px' />,
+    Header: (props) => <UserCustomHeader tableProps={props} title='Quiz ID' className='min-w-125px' />,
     accessor: 'id',
   },
   {
@@ -41,12 +43,32 @@ const usersColumns: ReadonlyArray<Column<User>> = [
     id: 'subject',
     Cell: ({...props}) => <SubjectCell subject_id={props.data[props.row.index].subject_id} />,
   },
-  // {
-  //   Header: (props) => (
-  //     <UserCustomHeader tableProps={props} title='Courses' className='min-w-125px' />
-  //   ),
-  //   accessor: 'courses',
-  // },
+  {
+    Header: (props) => (
+      <UserCustomHeader tableProps={props} title='Language' className='min-w-125px' />
+    ),
+    accessor: 'language',
+  },
+  {
+    Header: (props) => (
+      <UserCustomHeader tableProps={props} title='No.of Questions' className='min-w-125px' />
+    ),
+    accessor: 'total_questions',
+  },
+  {
+    Header: (props) => (
+      <UserCustomHeader tableProps={props} title='Marks' className='min-w-125px' />
+    ),
+    id: 'marks',
+    Cell: ({...props}) => <MarksCell marks={props.data[props.row.index].marks} />,
+  },  
+  {
+    Header: (props) => (
+      <UserCustomHeader tableProps={props} title='Quiz Type' className='min-w-125px' />
+    ),
+    id: 'quiz_type_id',
+    Cell: ({...props}) => <QuizTypeCell quizTypeId={props.data[props.row.index].quiz_type_id} />,
+  },  
   {
     Header: (props) => (
       <UserCustomHeader tableProps={props} title='Added Date' className='min-w-125px' />
@@ -71,7 +93,7 @@ const usersColumns: ReadonlyArray<Column<User>> = [
       <UserCustomHeader tableProps={props} title='Actions' className='text-end min-w-100px' />
     ),
     id: 'actions',
-    Cell: ({...props}) => <UserActionsCell id={props.data[props.row.index].id} />,
+    Cell: ({...props}) => <UserActionsCell id={props.data[props.row.index].id} data={props.data[props.row.index]}/>,
   },
 ]
 

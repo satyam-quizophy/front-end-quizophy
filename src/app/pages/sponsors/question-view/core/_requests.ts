@@ -2,10 +2,10 @@ import axios, {AxiosResponse} from 'axios'
 import {ID, Response} from '../../../../../_metronic/helpers'
 import {User, UsersQueryResponse} from './_models'
 
-const API_URL = 'https://quiz.datacubeindia.com/api/common'
+const API_URL = window.location.host==="localhost:3011"?"http://localhost:5000/api/common" :'https://quiz.quizophy.com/api/common'
 const SUBSCRIPTION_URL = `${API_URL}/subscription`
-const PROGRAM = 'https://quiz.datacubeindia.com/api/common/programs'
-const SPONSOR = 'https://quiz.datacubeindia.com/api/common/sponsors'
+const PROGRAM =window.location.host==="localhost:3011"?"http://localhost:5000/api/common/program/programs": 'https://quiz.quizophy.com/api/common/program/programs'
+const SPONSOR =window.location.host==="localhost:3011"?"http://localhost:5000/api/common/sponsor/sponsors": 'https://quiz.quizophy.com/api/common/sponsor/sponsors'
 
 const getUsers = (query: string): Promise<UsersQueryResponse> => {
   return axios

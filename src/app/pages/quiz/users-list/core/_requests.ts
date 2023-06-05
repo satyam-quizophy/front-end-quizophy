@@ -2,10 +2,10 @@ import axios, {AxiosResponse} from 'axios'
 import {ID, Response} from '../../../../../_metronic/helpers'
 import {User, UsersQueryResponse} from './_models'
 
-const API_URL = 'https://quiz.datacubeindia.com/api/quiz'
+const API_URL =window.location.host==="localhost:3011"?"http://localhost:5003/api/quiz": 'https://quiz.quizophy.com/api/quiz'
 const USER_URL = `${API_URL}/quiz`
-const COURSE_URL = 'https://quiz.datacubeindia.com/api/common/course'
-const SUBJECT_URL = 'https://quiz.datacubeindia.com/api/common/subject/getAll'
+const COURSE_URL =window.location.host==="localhost:3011"?"http://localhost:5000/api/common/course": 'https://quiz.quizophy.com/api/common/course'
+const SUBJECT_URL =window.location.host==="localhost:3011"?"http://localhost:5000/api/common/subject/getAll": 'https://quiz.quizophy.com/api/common/subject/getAll'
 const QUIZTYPE_URL = `${API_URL}/quizType`
 
 const getUsers = (query: string): Promise<UsersQueryResponse> => {
@@ -24,17 +24,17 @@ const getQuizTypes = (): Promise<any> => {
   return axios.get(`${QUIZTYPE_URL}`).then((d: AxiosResponse<any>) => d.data)
 }
 
-const getUserById = (id: ID): Promise<User | undefined> => {
+const getUserById = (id: ID): Promise<any | undefined> => {
   return axios
     .get(`${USER_URL}/${id}`)
-    .then((response: AxiosResponse<Response<User>>) => response.data)
-    .then((response: Response<User>) => response.data)
+    .then((response: AxiosResponse<Response<any>>) => response.data)
+    .then((response: Response<any>) => response.data)
 }
 
-const createUser = (user: User): Promise<User | undefined> => {
+const createUser = (user: any): Promise<any | undefined> => {
   return axios
     .post(USER_URL, user)
-    .then((response: AxiosResponse<Response<User>>) => response.data)
+    .then((response: AxiosResponse<Response<any>>) => response.data)
     .then((response: Response<User>) => response.data)
 }
 
@@ -50,6 +50,10 @@ const updateStatus = (status: any, id: ID): Promise<User | undefined> => {
     .put(`${USER_URL}/${id}`, status)
     .then((response: AxiosResponse<Response<User>>) => response.data)
     .then((response: Response<User>) => response.data)
+}
+
+const getQuizTypeById=(id:number)=>{
+  return axios.get(`${API_URL}/quiz/getQuizTypeById/${id}`)
 }
 
 const deleteUser = (userId: ID): Promise<void> => {
@@ -72,4 +76,5 @@ export {
   getAllCourses,
   getAllSubjects,
   getQuizTypes,
+  getQuizTypeById
 }

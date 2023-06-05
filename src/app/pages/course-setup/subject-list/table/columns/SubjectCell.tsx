@@ -14,14 +14,16 @@ type Props = {
 const SubjectCell: FC<Props> = ({courses}) => {
   const {allCategories} = useCommonData()
 
-  let item = allCategories?.filter((x: any) =>
-    courses?.some((y: any) => y.course_category_id == x.id)
-  )
-  item = item?.flatMap((x: any) => [x.course_category])
+  // let item = allCategories?.filter((x: any) =>
+  //   courses?.some((y: any) => y.course_category_id == x.id)
+  // )
+  // item = item?.flatMap((x: any) => [x.course_category])
 
   return (
     <div className='d-flex align-items-center'>
-      <div className='d-flex flex-column'>{item?.join(', ')}</div>
+      {/* <div className='d-flex flex-column'>{item?.join(', ')}</div> */}
+      <div className='d-flex flex-column'>{(courses?.course_ids)}</div>
+
     </div>
   )
 }

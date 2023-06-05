@@ -121,7 +121,7 @@ const PrivateRoutes = () => {
           }
         />
         <Route
-          path='questions'
+          path='questions/*'
           element={
             <SuspensedView>
               <MiddleWare><QuestionPage /></MiddleWare>
@@ -172,7 +172,7 @@ const PrivateRoutes = () => {
           path='books'
           element={
             <SuspensedView>
-              <MiddleWare><CoursePage /></MiddleWare>
+              <MiddleWare><BookPage /></MiddleWare>
             </SuspensedView>
           }
         />
@@ -180,7 +180,7 @@ const PrivateRoutes = () => {
           path='feedback'
           element={
             <SuspensedView>
-              <MiddleWare> <TemplatePage /></MiddleWare>
+              <MiddleWare> <FeedbackPage /></MiddleWare>
             </SuspensedView>
           }
         />

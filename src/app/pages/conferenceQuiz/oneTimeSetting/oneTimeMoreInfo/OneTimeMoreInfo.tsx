@@ -6,6 +6,7 @@ import Select from 'react-select'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ToastComp from '../../userList/ToastComp'
+import { useSelector } from 'react-redux'
 
 const OneTimeMoreInfo = () => {
     const params=useParams()
@@ -18,6 +19,15 @@ const OneTimeMoreInfo = () => {
         price:0,
         yourMessage:""
     })
+    const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+    const [permissionList,setPermissionList]=useState<any>({})
+    const filterStaffPermission=async (title:string)=>{
+      let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+      setPermissionList(result[0])
+    }
+    useEffect(()=>{
+      filterStaffPermission(navItem?.item)
+    },[navItem])
     const getOneTimeRequestById=async()=>{
        const {data}=await axios.get(`${APIURLQUIZ}/admin/getOneTimeRequest/${params?.id}`)
        if(data?.success){
@@ -138,14 +148,14 @@ const OneTimeMoreInfo = () => {
 
               </div>
               <div className="col-12 d-flex flex-column mt-6">
-              <button className="btn btn-success mt-5 text-center mx-auto" onClick={(e:any)=>{
+             {permissionList?.can_create && <button className="btn btn-success mt-5 text-center mx-auto" onClick={(e:any)=>{
                    e?.preventDefault()
                    confirmRequest()
-              }}>Confirm Request</button>
-               <button className="btn btn-danger mt-5 text-center mx-auto" onClick={(e:any)=>{
+              }}>Confirm Request</button>}
+             {permissionList?.can_delete &&  <button className="btn btn-danger mt-5 text-center mx-auto" onClick={(e:any)=>{
                    e?.preventDefault()
                    deleteOneTimeRequestById()
-              }}>Delete Request</button>
+              }}>Delete Request</button>}
               
               </div>
             

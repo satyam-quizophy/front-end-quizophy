@@ -2,7 +2,7 @@
 import axios, {AxiosResponse} from 'axios'
 import clsx from 'clsx'
 import React, {FC, useEffect, useState} from 'react'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import Swal from 'sweetalert2'
 import {KTSVG, toAbsoluteUrl} from '../../../../_metronic/helpers'
 import {Dropdown1, ChatInner} from '../../../../_metronic/partials'
@@ -15,6 +15,7 @@ import { APIURLQUIZ } from '../../conferenceQuiz/APIURL'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import { errrorMessage, successMessage } from '../../../modules/auth/components/ToastComp'
+import { useSelector } from 'react-redux'
 
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
@@ -31,6 +32,19 @@ const PaymentGateway: FC = () => {
     merchant_id:"",
     active_status:true
   })
+const navigate= useNavigate()
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+    if(!result[0]?.can_view){
+       navigate("/dashboard")
+    }
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem.item)
+    },[])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if(paymentGatewayCredential?.id){
@@ -202,18 +216,22 @@ const PaymentGateway: FC = () => {
               <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
               <div className="col-md-12 fv-row fv-plugins-icon-container mt-6">
                       <label className="required fs-6 fw-semibold mb-1">Activate Credentials</label>
-                      <Switch {...label} checked={paymentGatewayCredential?.id ? paymentGatewayCredential?.active_status : createPaymnetGatewayCredentials?.active_status} onChange={handleChange} value=""/>
+                      <Switch {...label} checked={paymentGatewayCredential?.id ? paymentGatewayCredential?.active_status : createPaymnetGatewayCredentials?.active_status} onChange={permissionList?.can_edit && handleChange} value=""/>
               <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
 
               <div className="col-12 d-flex flex-row">
-                    <button className="btn btn-danger mt-5 text-center mx-auto" disabled={paymentGatewayCredential?.id ? false : true} onClick={(e:any)=>{
+                  { permissionList?.can_delete && <button className="btn btn-danger mt-5 text-center mx-auto" disabled={paymentGatewayCredential?.id ? false : true} onClick={(e:any)=>{
                         e?.preventDefault()
                         deleteCredential()
-                    }}>Delete Credentials</button>
+                    }}>Delete Credentials</button>}
+                   
+                   {
+                    ((paymentGatewayCredential?.id && permissionList?.can_edit) ||  (!paymentGatewayCredential?.id && permissionList?.can_create)) &&
+                   
                     <button className="btn btn-success mt-5 text-center mx-auto" onClick={(e:any)=>{
                         e?.preventDefault()
                         updateCredential()
-                    }}>{paymentGatewayCredential?.id ? "Update" : "Create"} Credentials</button>
+                    }}>{paymentGatewayCredential?.id ? "Update" : "Create"} Credentials</button>}
               </div>
               </div>
             }
@@ -254,19 +272,24 @@ const PaymentGateway: FC = () => {
               <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
               <div className="col-md-12 fv-row fv-plugins-icon-container mt-6">
                       <label className="required fs-6 fw-semibold mb-1">Activate Credentials</label>
-                      <Switch {...label} checked={paymentGatewayCredential?.id ? paymentGatewayCredential?.active_status : createPaymnetGatewayCredentials?.active_status} onChange={handleChange} value=""/>
+                      <Switch {...label} checked={paymentGatewayCredential?.id ? paymentGatewayCredential?.active_status : createPaymnetGatewayCredentials?.active_status} onChange={permissionList?.can_edit && handleChange} value=""/>
               <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
 
               <div className="col-12 d-flex flex-row">
+                  {
+                    permissionList?.can_delete &&
                     <button className="btn btn-danger mt-5 text-center mx-auto" disabled={paymentGatewayCredential?.id ? false : true} onClick={(e:any)=>{
                         e?.preventDefault()
                         deleteCredential()
 
-                    }}>Delete Credentials</button>
+                    }}>Delete Credentials</button>}
+                   {
+                    ((paymentGatewayCredential?.id && permissionList?.can_edit) ||  (!paymentGatewayCredential?.id && permissionList?.can_create)) &&
+                   
                     <button className="btn btn-success mt-5 text-center mx-auto" onClick={(e:any)=>{
                         e?.preventDefault()
                         updateCredential()
-                    }}>{paymentGatewayCredential?.id ? "Update" : "Create"} Credentials</button>
+                    }}>{paymentGatewayCredential?.id ? "Update" : "Create"} Credentials</button>}
               </div>
               </div>
             }
@@ -307,19 +330,22 @@ const PaymentGateway: FC = () => {
               <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
               <div className="col-md-12 fv-row fv-plugins-icon-container mt-6">
                       <label className="required fs-6 fw-semibold mb-1">Activate Credentials</label>
-                      <Switch {...label} checked={paymentGatewayCredential?.id ? paymentGatewayCredential?.active_status : createPaymnetGatewayCredentials?.active_status} onChange={handleChange} value=""/>
+                      <Switch {...label} checked={paymentGatewayCredential?.id ? paymentGatewayCredential?.active_status : createPaymnetGatewayCredentials?.active_status} onChange={permissionList?.can_edit && handleChange} value=""/>
               <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
 
               <div className="col-12 d-flex flex-row">
-                    <button className="btn btn-danger mt-5 text-center mx-auto" disabled={paymentGatewayCredential?.id ? false : true} onClick={(e:any)=>{
+                  {permissionList?.can_delete &&  <button className="btn btn-danger mt-5 text-center mx-auto" disabled={paymentGatewayCredential?.id ? false : true} onClick={(e:any)=>{
                         e?.preventDefault()
                         deleteCredential()
 
-                    }}>Delete Credentials</button>
+                    }}>Delete Credentials</button>}
+                    {
+                    ((paymentGatewayCredential?.id && permissionList?.can_edit) ||  (!paymentGatewayCredential?.id && permissionList?.can_create)) &&
+                   
                     <button className="btn btn-success mt-5 text-center mx-auto" onClick={(e:any)=>{
                         e?.preventDefault()
                         updateCredential()
-                    }}>{paymentGatewayCredential?.id ? "Update" : "Create"} Credentials</button>
+                    }}>{paymentGatewayCredential?.id ? "Update" : "Create"} Credentials</button>}
               </div>
               </div>
             }
@@ -360,19 +386,22 @@ const PaymentGateway: FC = () => {
               <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
               <div className="col-md-12 fv-row fv-plugins-icon-container mt-6">
                       <label className="required fs-6 fw-semibold mb-1">Activate Credentials</label>
-                      <Switch {...label} checked={paymentGatewayCredential?.id ? paymentGatewayCredential?.active_status : createPaymnetGatewayCredentials?.active_status} onChange={handleChange} value=""/>
+                      <Switch {...label} checked={paymentGatewayCredential?.id ? paymentGatewayCredential?.active_status : createPaymnetGatewayCredentials?.active_status} onChange={permissionList?.can_edit && handleChange} value=""/>
               <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
 
               <div className="col-12 d-flex flex-row">
-                    <button className="btn btn-danger mt-5 text-center mx-auto" disabled={paymentGatewayCredential?.id ? false : true} onClick={(e:any)=>{
+                  {permissionList?.can_delete &&  <button className="btn btn-danger mt-5 text-center mx-auto" disabled={paymentGatewayCredential?.id ? false : true} onClick={(e:any)=>{
                         e?.preventDefault()
                         deleteCredential()
 
-                    }}>Delete Credentials</button>
+                    }}>Delete Credentials</button>}
+                  {
+                    ((paymentGatewayCredential?.id && permissionList?.can_edit) ||  (!paymentGatewayCredential?.id && permissionList?.can_create)) &&
+                   
                     <button className="btn btn-success mt-5 text-center mx-auto" onClick={(e:any)=>{
                         e?.preventDefault()
                         updateCredential()
-                    }}>{paymentGatewayCredential?.id ? "Update" : "Create"} Credentials</button>
+                    }}>{paymentGatewayCredential?.id ? "Update" : "Create"} Credentials</button>}
               </div>
               </div>
             }
@@ -413,19 +442,22 @@ const PaymentGateway: FC = () => {
               <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
               <div className="col-md-12 fv-row fv-plugins-icon-container mt-6">
                       <label className="required fs-6 fw-semibold mb-1">Activate Credentials</label>
-                      <Switch {...label} checked={paymentGatewayCredential?.id ? paymentGatewayCredential?.active_status : createPaymnetGatewayCredentials?.active_status} onChange={handleChange}/>
+                      <Switch {...label} checked={paymentGatewayCredential?.id ? paymentGatewayCredential?.active_status : createPaymnetGatewayCredentials?.active_status} onChange={permissionList?.can_edit && handleChange}/>
               <div className="fv-plugins-message-container mb-1 invalid-feedback"></div></div>
 
               <div className="col-12 d-flex flex-row">
-                    <button className="btn btn-danger mt-5 text-center mx-auto" disabled={paymentGatewayCredential?.id ? false : true} onClick={(e:any)=>{
+                  {permissionList?.can_delete &&  <button className="btn btn-danger mt-5 text-center mx-auto" disabled={paymentGatewayCredential?.id ? false : true} onClick={(e:any)=>{
                         e?.preventDefault()
                         deleteCredential()
 
-                    }}>Delete Credentials</button>
+                    }}>Delete Credentials</button>}
+                    {
+                    ((paymentGatewayCredential?.id && permissionList?.can_edit) ||  (!paymentGatewayCredential?.id && permissionList?.can_create)) &&
+                   
                     <button className="btn btn-success mt-5 text-center mx-auto" onClick={(e:any)=>{
                         e?.preventDefault()
                         updateCredential()
-                    }}>{paymentGatewayCredential?.id ? "Update" : "Create"} Credentials</button>
+                    }}>{paymentGatewayCredential?.id ? "Update" : "Create"} Credentials</button>}
               </div>
               </div>
             }

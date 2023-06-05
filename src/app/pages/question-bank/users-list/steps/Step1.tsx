@@ -23,6 +23,9 @@ const Step1: FC<Props> = ({setFieldValue, values, touched, setFieldError, errors
   const [subjects, setSubjects] = useState(values.id ? allSubjects : [])
   const [selectedCourses, setSelectedCourses] = useState<any>(null)
 
+  {
+    console.log(allSubjects)
+  }
   useEffect(() => {
     if (values.id && courses.length > 0) {
       const selected = courses.filter((x: any) =>
@@ -36,7 +39,15 @@ const Step1: FC<Props> = ({setFieldValue, values, touched, setFieldError, errors
   }, [courses])
 
   const getSubject = async (ids: any) => {
-    let items = allSubjects?.filter((x: any) => ids.some((y: any) => y == x.course_id))
+    // let items = allSubjects?.filter((x: any) => ids.some((y: any) => y == x.subject_id))
+    let items = allSubjects?.filter((x: any) =>{
+      return  x.courses.map((item:any)=>{
+          if(ids.includes(item.course_category_id)){
+             return x
+          }
+       })
+  })
+    console.log(items)
     setSubjects(items)
   }
 
@@ -99,7 +110,10 @@ const Step1: FC<Props> = ({setFieldValue, values, touched, setFieldError, errors
             classNamePrefix='select'
             value={selectedCourses}
             onChange={(e, i) => {
-              const ids = e.flatMap((item, i) => [item.id])
+              // const ids = e.flatMap((item, i) => [item.id])
+              const ids = e.flatMap((item:any, i:number) => {
+                return item.course_category.flatMap((item2:any)=>[item2.id])
+            })
               getSubject(ids)
               setFieldValue('courses', e)
               setSelectedCourses(e)
@@ -123,7 +137,7 @@ const Step1: FC<Props> = ({setFieldValue, values, touched, setFieldError, errors
             placeholder='Select an option'
           >
             <option></option>
-            {subjects.map((item: any, i: any) => (
+            {subjects?.map((item: any, i: any) => (
               <option key={i} value={item.id}>
                 {item.subject_name}
               </option>

@@ -73,12 +73,15 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
     setSubmitButton(stepper.current.currentStepIndex === stepper.current.totatStepsNumber! - 1)
     setCurrentSchema(createAccountSchemas[stepper.current.currentStepIndex])
     if (stepper.current.currentStepIndex !== stepper.current.totatStepsNumber) {
-      const user = await updateUser(values)
-      actions.setFieldValue('id', user?.id)
-      actions.setFieldValue('marks', user?.marks)
+      console.log(values,"update")
+
+      // const user = await updateUser(values)
+      // actions.setFieldValue('id', user?.id)
+      // actions.setFieldValue('marks', user?.marks)
       stepper.current.goNext()
     } else {
       try {
+        console.log(values,"create")
         await createUser(values.questions[selectedLang])
       } catch (ex) {
         console.error(ex)

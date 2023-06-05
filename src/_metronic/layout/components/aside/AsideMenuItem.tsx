@@ -11,6 +11,7 @@ type Props = {
   icon?: string
   fontIcon?: string
   hasBullet?: boolean
+  setNavItem?:any
 }
 
 const AsideMenuItem: React.FC<Props> = ({
@@ -20,6 +21,7 @@ const AsideMenuItem: React.FC<Props> = ({
   icon,
   fontIcon,
   hasBullet = false,
+  setNavItem=()=>{}
 }) => {
   const {pathname} = useLocation()
   const isActive = checkIsActive(pathname, to)
@@ -40,7 +42,12 @@ const AsideMenuItem: React.FC<Props> = ({
           </span>
         )}
         {fontIcon && aside.menuIcon === 'font' && <i className={clsx('bi fs-3', fontIcon)}></i>}
-        <span className='menu-title'>{title}</span>
+        <span className='menu-title' onClick={(e:any)=>{
+          // e?.preventDefault()
+          if(title==="Settings")
+            setNavItem("General")
+          else setNavItem(title)
+        }}>{title}</span>
       </Link>
       {children}
     </div>

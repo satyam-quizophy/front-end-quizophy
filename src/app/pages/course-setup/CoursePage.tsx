@@ -3,6 +3,7 @@ import {PageLink, PageTitle} from '../../../_metronic/layout/core'
 import {QuestionListWrapper} from './category-list/QuestionList'
 import {QuestionViewWrapper} from './subject-list/QuestionView'
 import {UsersListWrapper} from './course-list/UsersList'
+import { CommonDataProvider } from './commonData/CommonDataProvider'
 
 const usersBreadcrumbs: Array<PageLink> = [
   {
@@ -28,7 +29,7 @@ const CoursePage = () => {
           element={
             <>
               <PageTitle breadcrumbs={usersBreadcrumbs}>Courses list</PageTitle>
-              <UsersListWrapper />
+              <CommonDataProvider><UsersListWrapper /></CommonDataProvider>
             </>
           }
         />
@@ -37,7 +38,7 @@ const CoursePage = () => {
           element={
             <>
               <PageTitle breadcrumbs={usersBreadcrumbs}>Course Category list</PageTitle>
-              <QuestionListWrapper />
+              <CommonDataProvider><QuestionListWrapper /></CommonDataProvider>
             </>
           }
         />
@@ -46,7 +47,7 @@ const CoursePage = () => {
           element={
             <>
               <PageTitle breadcrumbs={usersBreadcrumbs}>Subject list</PageTitle>
-              <QuestionViewWrapper />
+              <CommonDataProvider><QuestionViewWrapper /></CommonDataProvider>
             </>
           }
         />

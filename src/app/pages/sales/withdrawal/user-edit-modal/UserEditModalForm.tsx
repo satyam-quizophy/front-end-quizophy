@@ -83,7 +83,7 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
                     <option></option>
                     {users?.map((item: any) => (
                       <option key={item.id} value={item.id}>
-                        {item?.firstname} {item?.lastname} - ({item.phone})
+                        {item?.firstname} {item?.lastname} - ({item?.phone})
                       </option>
                     ))}
                   </Field>

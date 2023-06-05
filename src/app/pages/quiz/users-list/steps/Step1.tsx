@@ -51,7 +51,8 @@ const Step1: FC<Props> = ({setFieldValue, values, touched, setFieldError, errors
 
   const quizTypes = async () => {
     await getQuizTypes()
-      .then((data) => {
+      .then((data:any) => {
+        console.log(data)
         setQuizType(data)
       })
       .catch((err) => {
@@ -59,10 +60,21 @@ const Step1: FC<Props> = ({setFieldValue, values, touched, setFieldError, errors
       })
   }
 
-  const getSubject = (ids: any) => {
-    let items = allSubjects?.filter((x: any) => ids.some((y: any) => y == x.course_id))
+  const getSubject = async (ids: any) => {
+    let items = allSubjects?.filter((x: any) =>{
+        return  x.courses.map((item:any)=>{
+            if(ids.includes(item.course_category_id)){
+               return x
+            }
+         })
+    })
     setSubjects(items)
   }
+
+  // const getSubject = (ids: any) => {
+  //   let items = allSubjects?.filter((x: any) => ids.some((y: any) => y == x.id))
+  //   setSubjects(items)
+  // }
 
   return (
     <div className='w-100'>
@@ -114,8 +126,10 @@ const Step1: FC<Props> = ({setFieldValue, values, touched, setFieldError, errors
             classNamePrefix='select'
             value={selectedCourses}
             onChange={(e, i) => {
-              const ids = e.flatMap((item, i) => [item.id])
-              getSubject(ids)
+              const ids = e.flatMap((item:any, i:number) => {
+                return item.course_category.flatMap((item2:any)=>[item2.id])
+            })
+            getSubject(ids)
               setFieldValue('courses', e)
               setSelectedCourses(e)
             }}
@@ -126,6 +140,9 @@ const Step1: FC<Props> = ({setFieldValue, values, touched, setFieldError, errors
             <ErrorMessage name='courses' />
           </div>
         </div>
+        {
+          selectedCourses?.length>0 &&
+        
         <div className='fv-row w-100 flex-md-root'>
           <label className='d-flex align-items-center form-label'>
             <span className='required'>Subject</span>
@@ -149,6 +166,7 @@ const Step1: FC<Props> = ({setFieldValue, values, touched, setFieldError, errors
             <ErrorMessage name='subject_id' />
           </div>
         </div>
+        }
       </div>
 
       <div className='d-flex flex-wrap gap-5 mb-10'>

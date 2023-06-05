@@ -48,12 +48,13 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
   const submitStep = async (values: User, actions: FormikValues) => {
     try {
       values.image = roleForEdit.image
+      console.log(values)
       await createUser(values)
       actions.resetForm()
       cancel(true)
       Swal.fire({
         title: 'Success!',
-        text: `Sponsorship Program Updated!`,
+        text: `Course Categfory Updated Successfully`,
         icon: 'success',
         confirmButtonText: 'Okay',
       })
@@ -68,9 +69,9 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
     const fd = new FormData()
     fd.append('image', file)
     await axios
-      .post(`${API_URL}/upload`, fd)
+      .post(`${API_URL}/staff/upload-image`, fd)
       .then((data: AxiosResponse<any>) => {
-        setRoleForEdit({...roleForEdit, image: data.data})
+        setRoleForEdit({...roleForEdit, image: data.data.image})
       })
       .catch((err) => {
         console.log(err, 'err')
@@ -133,7 +134,7 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
                 <div className='form-text'>Allowed file types: png, jpg, jpeg.</div>
               </div>
 
-              <div className='fv-row w-100 mb-10'>
+              {/* <div className='fv-row w-100 mb-10'>
                 <label className='d-flex align-items-center form-label'>
                   <span className='required'>Select Course</span>
                 </label>
@@ -145,7 +146,7 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
                   placeholder={'Select Course'}
                 >
                   <option></option>
-                  {allCourses.map((item: any) => (
+                  {allCourses?.map((item: any) => (
                     <option key={item.id} value={item.id}>
                       {item.course_name}
                     </option>
@@ -154,7 +155,7 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
                 <div className='text-danger mt-2'>
                   <ErrorMessage name='course_id' />
                 </div>
-              </div>
+              </div> */}
 
               <div className='fv-row w-100 mb-10'>
                 <label className='form-label required'>Course Category Name</label>

@@ -70,9 +70,9 @@ const UserEditModalForm: FC<Props> = ({role, isUserLoading}) => {
     const fd = new FormData()
     fd.append('image', file)
     await axios
-      .post(`${API_URL}/upload`, fd)
+      .post(`${API_URL}/staff/upload-image`, fd)
       .then((data: AxiosResponse<any>) => {
-        setRoleForEdit({...roleForEdit, image: data.data})
+        setRoleForEdit({...roleForEdit, image: data.data.image})
       })
       .catch((err) => {
         console.log(err, 'err')

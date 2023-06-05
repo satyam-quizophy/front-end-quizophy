@@ -3,16 +3,29 @@ import Swal from 'sweetalert2'
 import {ID} from '../../../../../../_metronic/helpers'
 import {addQuestion, deleteUser, getQuizQuestions} from '../../core/_requests'
 import {useParams} from 'react-router-dom'
+import { successMessage, warningMessage } from '../../../../../modules/auth/components/ToastComp'
+import { useSelector } from 'react-redux'
 
 type Props = {
-  id?: ID
+  id?: any
 }
 
 const UserTwoStepsCell: FC<Props> = ({id}) => {
   const params = useParams()
+  const {staffPermission,navItem}=useSelector((state:any)=>state.reducerData)
+  const [permissionList,setPermissionList]=useState<any>({})
+  const filterStaffPermission=async (title:string)=>{
+    let result=staffPermission.filter((item:any)=>item.permission_name===title && item)
+    setPermissionList(result[0])
+  }
+  useEffect(()=>{
+    filterStaffPermission(navItem?.item)
+    },[navItem])
+    
   console.log(params, 'params')
   useEffect(() => {
-    getQuizQuestions(id)
+    console.log("id:   ",id)
+    getQuizQuestions(id,Number(params.id))
       .then((data) => {
         setStatus(data)
       })
@@ -38,14 +51,31 @@ const UserTwoStepsCell: FC<Props> = ({id}) => {
             checked={status}
             onChange={async (e) => {
               if (e.currentTarget.checked) {
-                await addQuestion({quiz_id: params.id, question_bank_id: id})
+                if(permissionList?.can_create){
+                  const {data}=await addQuestion({quiz_id: params.id, question_bank_id: id})
+                  if(!data.success){
+                    warningMessage("Quiz limit exceeded for adding questions.")
+                  }else{
+                    setStatus(!status)
+                    successMessage("Question Added Successfully")
+                  }
+                }else{
+                  warningMessage("You are not authorized to access")
+                }              
               } else {
-                await deleteUser(id)
+                if(permissionList?.can_delete){
+                  successMessage("Question Removed Successfully")
+                  await deleteUser(id,params.id)
+                  setStatus(!status)
+                }
+                else{
+                  warningMessage("You are not authorized to access")
+                }
+                
               }
-              setStatus(!status)
             }}
           />
-          <span style={{color: status == false ? '#44A8C1' : '#D8322D'}}>
+          <span className="cursor-pointer" style={{color: status == false ? '#44A8C1' : '#D8322D'}}>
             {status == true ? 'Remove from Quiz' : 'Add to Quiz'}
           </span>
         </label>

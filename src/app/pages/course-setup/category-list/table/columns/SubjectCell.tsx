@@ -12,12 +12,12 @@ type Props = {
 }
 
 const SubjectCell: FC<Props> = ({course_id}) => {
-  const {allCourses} = useCommonData()
-  const item = allCourses?.find((x: any) => x.id == course_id)?.course_name
+  const {allCategory} = useCommonData()
+  const item = allCategory?.find((x: any) => x.id == course_id)?.id
 
   return (
     <div className='d-flex align-items-center'>
-      <div className='d-flex flex-column'>{item}</div>
+      <div className='d-flex flex-column'>{course_id?.id}</div>
     </div>
   )
 }

@@ -19,11 +19,10 @@ const getUserById = (id: ID): Promise<Permission | undefined> => {
     .then((response: Response<Permission>) => response.data)
 }
 
-const createUser = (user: Permission): Promise<Permission | undefined> => {
+const createUser = (user: Permission): Promise<any | undefined> => {
   return axios
     .post(PERMISSION_URL, user)
-    .then((response: AxiosResponse<Response<Permission>>) => response.data)
-    .then((response: Response<Permission>) => response.data)
+    .then((response: AxiosResponse<Response<any>>) => response.data)
 }
 
 const updateUser = (user: Permission): Promise<Permission | undefined> => {
